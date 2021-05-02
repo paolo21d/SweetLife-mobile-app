@@ -27,6 +27,7 @@ dependencies:
   intl: ^0.16.1
   http: ^0.12.2
   shared_preferences: ^0.5.12+4
+  carousel_slider: ^3.0.0
 #  google_fonts: ^1.1.2
 
 

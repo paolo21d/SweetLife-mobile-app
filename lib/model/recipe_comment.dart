@@ -1,9 +1,10 @@
 class RecipeComment {
   final int id;
-  final double rate;
   final DateTime auditCD;
   final int userId;
+  final String userLogin;
   final int recipeId;
 
-  RecipeComment(this.id, this.rate, this.auditCD, this.userId, this.recipeId);
+  RecipeComment(
+      this.id, this.auditCD, this.userId, this.userLogin, this.recipeId);
 }

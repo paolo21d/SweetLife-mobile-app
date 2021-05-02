@@ -4,6 +4,7 @@ import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/recipe.dart';
 import 'package:SweetLife/model/recipe_photo.dart';
 import 'package:SweetLife/model/unit.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 import '../../app_drawer.dart';
@@ -18,7 +19,11 @@ class RecipeDetails extends StatelessWidget {
       1,
       [
         RecipePhoto(1,
-            "https://assets.tmecosys.com/image/upload/t_web667x528/img/recipe/ras/Assets/5e057cbe-e64e-484b-b8e2-19c9c74ddcd2/Derivates/0702d718-d752-447c-a1b2-c8b35fc71643.jpg")
+            "https://assets.tmecosys.com/image/upload/t_web667x528/img/recipe/ras/Assets/5e057cbe-e64e-484b-b8e2-19c9c74ddcd2/Derivates/0702d718-d752-447c-a1b2-c8b35fc71643.jpg"),
+        RecipePhoto(2,
+            "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fimages.media-allrecipes.com%2Fuserphotos%2F7662123.jpg&q=85"),
+        RecipePhoto(3,
+            "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fimages.media-allrecipes.com%2Fuserphotos%2F8368810.jpg&q=85")
       ],
       [
         ElementOfRecipe(
@@ -52,13 +57,19 @@ class RecipeDetails extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            SizedBox(
+              height: 10,
+            ),
             /* images */
+            //https://pub.dev/packages/carousel_slider/example
             Container(
-              height: 300,
-              width: double.infinity,
-              child: Image.network(
-                recipe.photos[0].image,
-                fit: BoxFit.cover,
+              child: CarouselSlider(
+                options: CarouselOptions(
+                  aspectRatio: 2.0,
+                  enlargeCenterPage: true,
+                  pageViewKey: PageStorageKey<String>('carousel_slider'),
+                ),
+                items: imageSliders(),
               ),
             ),
             SizedBox(
@@ -150,10 +161,29 @@ class RecipeDetails extends StatelessWidget {
             ),
 
             /* Comments */
-            Card()
+            Card(
+              child: Column(
+                children: [
+                  Text("Comments"),
+
+                ],
+              ),
+            )
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> imageSliders() {
+    return recipe.photos
+        .map((photo) => Container(
+              margin: EdgeInsets.all(5.0),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  child: Image.network(photo.image,
+                      fit: BoxFit.cover, width: 1000.0)),
+            ))
+        .toList();
   }
 }
