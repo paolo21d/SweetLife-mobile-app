@@ -2,10 +2,12 @@ import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/element_of_recipe.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/recipe.dart';
+import 'package:SweetLife/model/recipe_comment.dart';
 import 'package:SweetLife/model/recipe_photo.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../app_drawer.dart';
 
@@ -44,7 +46,12 @@ class RecipeDetails extends StatelessWidget {
         ConfectioneryType(1, "confType1"),
         ConfectioneryType(2, "confType2"),
       ],
-      [],
+      [
+        RecipeComment(1, "comment 1", DateTime(2021), 1, "login1", 1),
+        RecipeComment(2, "comment 2", DateTime(2021), 2, "login2", 1),
+        RecipeComment(3, "comment 3 comment 3 comment 3 comment 3 comment 3",
+            DateTime(2021), 3, "login3", 1),
+      ],
       4.5);
 
   @override
@@ -162,11 +169,28 @@ class RecipeDetails extends StatelessWidget {
 
             /* Comments */
             Card(
-              child: Column(
-                children: [
-                  Text("Comments"),
-
-                ],
+              child: ListTile(
+                leading: Icon(Icons.comment),
+                title: Text("Comments"),
+                subtitle: Column(
+                  children: [
+                    ...recipe.comments.map((comment) {
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(comment.userLogin),
+                            subtitle: Text(comment.comment),
+                            trailing: Text(
+                              DateFormat.yMMMd().format(comment.auditCD),
+                              style: TextStyle(fontSize: 10),
+                            ),
+                          ),
+                          Divider()
+                        ],
+                      );
+                    })
+                  ],
+                ),
               ),
             )
           ],
