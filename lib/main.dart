@@ -1,4 +1,5 @@
 import 'package:SweetLife/model/recipe_description.dart';
+import 'package:SweetLife/recipes/screens/recipe_creation.dart';
 import 'package:SweetLife/recipes/screens/recipe_details.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +50,8 @@ class SweetLifeApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
           scaffoldBackgroundColor: Colors.white),
       // home: RecipeList(recDesc),
-      home: RecipeDetails(),
+      // home: RecipeDetails(),
+      home: RecipeCreation(),
     );
   }
 }
