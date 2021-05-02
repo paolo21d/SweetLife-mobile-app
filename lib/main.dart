@@ -1,5 +1,6 @@
+import 'package:SweetLife/model/recipe_description.dart';
+import 'package:SweetLife/recipes/screens/recipe_list.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   runApp(SweetLifeApp());
@@ -7,58 +8,32 @@ void main() {
 
 class SweetLifeApp extends StatelessWidget {
   // This widget is the root of your application.
+  final RecipeDescription rec1 = RecipeDescription(1, "Rec1", "desc1", 1,
+      "https://assets.tmecosys.com/image/upload/t_web667x528/img/recipe/ras/Assets/5e057cbe-e64e-484b-b8e2-19c9c74ddcd2/Derivates/0702d718-d752-447c-a1b2-c8b35fc71643.jpg", 2.5, 20);
+  final RecipeDescription rec2 = RecipeDescription(2, "Rec2", "desc2", 2,
+      "https://assets.tmecosys.com/image/upload/t_web667x528/img/recipe/ras/Assets/5e057cbe-e64e-484b-b8e2-19c9c74ddcd2/Derivates/0702d718-d752-447c-a1b2-c8b35fc71643.jpg", 2.5, 20);
+  List<RecipeDescription> recDesc = [];
+
+
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(
-          value: Auth(),
+    recDesc.add(rec1);
+    recDesc.add(rec2);recDesc.add(rec1);
+    recDesc.add(rec2);recDesc.add(rec1);
+    recDesc.add(rec2);recDesc.add(rec1);
+    recDesc.add(rec2);recDesc.add(rec1);
+    recDesc.add(rec2);
+    recDesc.add(rec1);
+    recDesc.add(rec2);
+
+    return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          accentColor: Colors.amberAccent,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          scaffoldBackgroundColor: Colors.white
         ),
-        ChangeNotifierProxyProvider<Auth, Products>(
-          builder: (ctx, auth, previousProducts) => Products(
-            auth.token,
-            auth.userId,
-            previousProducts == null ? [] : previousProducts.items,
-          ),
-        ),
-        ChangeNotifierProvider.value(
-          value: Cart(),
-        ),
-        ChangeNotifierProxyProvider<Auth, Orders>(
-          builder: (ctx, auth, previousOrders) => Orders(
-            auth.token,
-            auth.userId,
-            previousOrders == null ? [] : previousOrders.orders,
-          ),
-        ),
-      ],
-      child: Consumer<Auth>(
-        builder: (ctx, auth, _) => MaterialApp(
-          title: 'MyShop',
-          theme: ThemeData(
-            primarySwatch: Colors.purple,
-            accentColor: Colors.deepOrange,
-            fontFamily: 'Lato',
-          ),
-          home: auth.isAuth
-              ? ProductsOverviewScreen()
-              : FutureBuilder(
-            future: auth.tryAutoLogin(),
-            builder: (ctx, authResultSnapshot) =>
-            authResultSnapshot.connectionState ==
-                ConnectionState.waiting
-                ? SplashScreen()
-                : AuthScreen(),
-          ),
-          routes: {
-            ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
-            CartScreen.routeName: (ctx) => CartScreen(),
-            OrdersScreen.routeName: (ctx) => OrdersScreen(),
-            UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
-            EditProductScreen.routeName: (ctx) => EditProductScreen(),
-          },
-        ),
-      ),
-    );
+        home: RecipeList(recDesc));
   }
 }

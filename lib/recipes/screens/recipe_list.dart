@@ -1,3 +1,4 @@
+import 'package:SweetLife/app_drawer.dart';
 import 'package:SweetLife/model/recipe_description.dart';
 import 'package:SweetLife/recipes/widgets/recipe_list_item.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +10,17 @@ class RecipeList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1, crossAxisSpacing: 10, mainAxisSpacing: 10),
-      itemBuilder: (ctx, i) => RecipeListItem(recipeDescriptions[i]),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Recipe List"),
+      ),
+      drawer: AppDrawer(),
+      body: ListView.builder(
+        itemCount: recipeDescriptions.length,
+        itemBuilder: (context, index) {
+          return RecipeListItem(recipeDescriptions[index]);
+        },
+      ),
     );
   }
 }
