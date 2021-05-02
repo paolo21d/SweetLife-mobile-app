@@ -149,8 +149,25 @@ class RecipeDetails extends StatelessWidget {
                           )
                         ],
                       );
-                      /*return Text(
-                          "${element.amount} ${element.unit.name} ${element.ingredient.name}");*/
+                    })
+                  ],
+                ),
+              ),
+            ),
+
+            /* confectionery types */
+            Card(
+              child: ListTile(
+                leading: Icon(Icons.fastfood_rounded),
+                title: Text("Confectionery Types"),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...recipe.confectioneryType.map((confectioneryTypes) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 5.0),
+                        child: Text(confectioneryTypes.name),
+                      );
                     })
                   ],
                 ),
@@ -179,7 +196,7 @@ class RecipeDetails extends StatelessWidget {
                         children: [
                           ListTile(
                             title: Text(comment.userLogin),
-                            subtitle: Text(comment.comment),
+                            subtitle: Text(comment.content),
                             trailing: Text(
                               DateFormat.yMMMd().format(comment.auditCD),
                               style: TextStyle(fontSize: 10),
