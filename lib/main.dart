@@ -53,8 +53,8 @@ class SweetLifeApp extends StatelessWidget {
       // home: RecipeDetails(),
       // home: RecipeCreation(),
       // home: RecipeSearch(recDesc),
-      // home: ShoppingListOverview(),
-      home: ShoppingListDetails(),
+      home: ShoppingListOverview(),
+      // home: ShoppingListDetails(),
     );
   }
 }

@@ -84,6 +84,13 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
           );*/
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          //TODO redirect to ShoppingListCreation screen
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Theme.of(context).accentColor,
+      ),
     );
   }
 }
