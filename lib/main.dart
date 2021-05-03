@@ -1,7 +1,5 @@
 import 'package:SweetLife/model/recipe_description.dart';
-import 'package:SweetLife/recipes/screens/recipe_creation.dart';
-import 'package:SweetLife/recipes/screens/recipe_details.dart';
-import 'package:SweetLife/recipes/screens/recipe_search.dart';
+import 'package:SweetLife/shopping_list/screens/shopping_list_overview.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -52,8 +50,9 @@ class SweetLifeApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white),
       // home: RecipeList(recDesc),
       // home: RecipeDetails(),
-      home: RecipeCreation(),
+      // home: RecipeCreation(),
       // home: RecipeSearch(recDesc),
+      home: ShoppingListOverview(),
     );
   }
 }
