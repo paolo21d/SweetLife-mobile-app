@@ -24,10 +24,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
   List<File> addedPhotos = <File>[];
   List<ElementOfRecipe> addedIngredients = [];
 
-  TextEditingController _ingredientCreationIngredientName =
-      TextEditingController();
   TextEditingController _ingredientCreationAmount = TextEditingController();
-  TextEditingController _ingredientCreationUnit = TextEditingController();
 
   String choosedIngredientName;
   String choosedUnitName;
@@ -39,11 +36,16 @@ class _RecipeCreationState extends State<RecipeCreation> {
     ConfectioneryType(3, "Rurki"),
   ];
   List<Ingredient> availableIngredients = [
-    Ingredient(1, "ing1", [Unit(1, "Unit1"), Unit(2, "Unit2")]),
-    Ingredient(2, "ing2", [Unit(1, "Unit1")]),
-    Ingredient(3, "ing3", [Unit(2, "Unit2")]),
-    Ingredient(
-        4, "ing4", [Unit(1, "Unit1"), Unit(2, "Unit2"), Unit(3, "Unit3")]),
+    Ingredient(1, "ing1"),
+    Ingredient(2, "ing2"),
+    Ingredient(3, "ing3"),
+    Ingredient(4, "ing4"),
+  ];
+  List<Unit> availableUnits = [
+    Unit(1, "Unit1"),
+    Unit(2, "Unit2"),
+    Unit(3, "Unit3"),
+    Unit(4, "Unit4"),
   ];
 
   String dropdownValue = 'One';
@@ -205,7 +207,22 @@ class _RecipeCreationState extends State<RecipeCreation> {
                               }),
                         ],
                       ),
-                      // addedIngredients
+                      ...addedIngredients.map((ingredient) {
+                        return ListTile(
+                          title: Text(ingredient.ingredient.name),
+                          subtitle: Text(
+                              "${ingredient.amount} ${ingredient.unit.name}"),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              setState(() {
+                                addedIngredients.removeWhere(
+                                    (element) => element == ingredient);
+                              });
+                            },
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),
@@ -285,18 +302,14 @@ class _RecipeCreationState extends State<RecipeCreation> {
         .firstWhere((element) => element.name == ingredientName);
   }
 
-  _addIngredientFiled(BuildContext context) async {
-    ElementOfRecipe elementOfRecipe = ElementOfRecipe(
-        null,
-        2.0,
-        Ingredient(1, "ing1", [Unit(1, "Unit1"), Unit(2, "Unit2")]),
-        Unit(1, "Unit1"),
-        1,
-        1);
+  Unit _getUnitByName(String unitName) {
+    return availableUnits.firstWhere((element) => element.name == unitName);
+  }
 
+  _addIngredientFiled(BuildContext context) async {
     setState(() {
       choosedIngredientName = availableIngredients[0].name;
-      choosedUnitName = null;
+      choosedUnitName = availableUnits[0].name;
     });
 
     final result = await showDialog(
@@ -306,6 +319,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
         content: StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 /*DropdownButton<String>(
@@ -331,43 +345,52 @@ class _RecipeCreationState extends State<RecipeCreation> {
                   );
                 }).toList(),
               ),*/
+                // ingredient
+                Text("Ingredient:"),
                 DropdownButton(
-                    value: choosedIngredientName,
-                    items: availableIngredients.map((ingredient) {
-                      return new DropdownMenuItem(
-                        value: ingredient.name,
-                        child: Text(ingredient.name),
-                      );
-                    }).toList(),
-                    onChanged: (String newValue) {
-                      setState(() {
-                        choosedIngredientName = newValue;
-                        choosedUnitName =
-                            _getIngredientByName(choosedIngredientName)
-                                .availableUnits[0]
-                                .name;
-                      });
-                    }),
+                  value: choosedIngredientName,
+                  items: availableIngredients.map((ingredient) {
+                    return new DropdownMenuItem(
+                      value: ingredient.name,
+                      child: Text(ingredient.name),
+                    );
+                  }).toList(),
+                  onChanged: (String newValue) {
+                    setState(() {
+                      choosedIngredientName = newValue;
+                    });
+                  },
+                  isExpanded: true,
+                ),
+                // unit
+                SizedBox(
+                  height: 10,
+                ),
+                Text("Unit:"),
                 DropdownButton(
                   value: choosedUnitName,
-                  items: _getIngredientByName(choosedIngredientName)
-                      .availableUnits
-                      .map((unit) {
+                  items: availableUnits.map((unit) {
                     return DropdownMenuItem(
                       value: unit.name,
                       child: Text(unit.name),
                     );
                   }).toList(),
-                  onChanged: null,
+                  onChanged: (String newValue) {
+                    setState(() {
+                      choosedUnitName = newValue;
+                    });
+                  },
+                  isExpanded: true,
                 ),
+                //amount
+                SizedBox(
+                  height: 10,
+                ),
+                Text("Amount:"),
                 TextField(
                   controller: _ingredientCreationAmount,
                   decoration: InputDecoration(hintText: "Amount"),
                   keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: _ingredientCreationUnit,
-                  decoration: InputDecoration(hintText: "Unit"),
                 ),
               ],
             );
@@ -375,7 +398,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
         ),
         actions: [
           FlatButton(
-              onPressed: () => Navigator.of(ctx).pop(elementOfRecipe),
+              onPressed: () => Navigator.of(ctx).pop(true),
               child: Text("Save")),
           FlatButton(
               onPressed: () => Navigator.of(ctx).pop(false),
@@ -384,6 +407,17 @@ class _RecipeCreationState extends State<RecipeCreation> {
       ),
     );
 
-    // print("Wynik: \n Name: ${_ingredientCreationIngredientName.value.text} \n Amount: ${_ingredientCreationAmount.value.text} \n Unit: ${_ingredientCreationUnit.value.text}");
+    setState(() {
+      if (result) {
+        Ingredient ingredient = _getIngredientByName(choosedIngredientName);
+        Unit unit = _getUnitByName(choosedUnitName);
+        double amount = double.parse(_ingredientCreationAmount.value.text);
+        addedIngredients.add(ElementOfRecipe(
+            null, amount, ingredient, unit, ingredient.id, unit.id));
+      }
+      choosedIngredientName = availableIngredients[0].name;
+      choosedUnitName = availableUnits[0].name;
+      _ingredientCreationAmount.clear();
+    });
   }
 }
