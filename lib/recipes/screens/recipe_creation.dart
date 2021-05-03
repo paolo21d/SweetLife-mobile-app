@@ -1,5 +1,11 @@
+import 'dart:io';
+
 import 'package:SweetLife/model/confectionery_type.dart';
+import 'package:SweetLife/model/element_of_recipe.dart';
+import 'package:SweetLife/model/ingredient.dart';
+import 'package:SweetLife/model/unit.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../app_drawer.dart';
 
@@ -14,17 +20,34 @@ class _RecipeCreationState extends State<RecipeCreation> {
 
   final _form = GlobalKey<FormState>();
   bool _isInited = false;
+  Map<int, bool> checkedConfectioneryTypes = <int, bool>{};
+  List<File> addedPhotos = <File>[];
+  List<ElementOfRecipe> addedIngredients = [];
 
+  TextEditingController _ingredientCreationIngredientName =
+      TextEditingController();
+  TextEditingController _ingredientCreationAmount = TextEditingController();
+  TextEditingController _ingredientCreationUnit = TextEditingController();
+
+  //      MOCKS!!
   List<ConfectioneryType> availableConfectioneryTypes = [
     ConfectioneryType(1, "Torty"),
     ConfectioneryType(2, "Lody"),
     ConfectioneryType(3, "Rurki"),
   ];
-  Map<int, bool> checkedConfectioneryTypes = <int, bool>{};
+  List<Ingredient> availableIngredients = [
+    Ingredient(1, "ing1", [Unit(1, "Unit1"), Unit(2, "Unit2")]),
+    Ingredient(2, "ing2", [Unit(1, "Unit1")]),
+    Ingredient(3, "ing3", [Unit(2, "Unit2")]),
+    Ingredient(
+        4, "ing4", [Unit(1, "Unit1"), Unit(2, "Unit2"), Unit(3, "Unit3")]),
+  ];
 
   @override
   void didChangeDependencies() {
     if (!_isInited) {
+      addedPhotos = <File>[];
+      addedIngredients = [];
       _prepareCheckedConfectioneryTypes();
       _isInited = true;
     }
@@ -49,69 +72,138 @@ class _RecipeCreationState extends State<RecipeCreation> {
             key: _form,
             child: ListView(
               children: [
-                //name
-                TextFormField(
-                    initialValue: "",
-                    decoration: InputDecoration(labelText: "Name"),
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (_) {
-                      FocusScope.of(context)
-                          .requestFocus(_preparationTimeFocusNode);
-                    },
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter recipe name';
-                      }
-                      return null;
-                    }),
+                Card(
+                  child: Column(
+                    children: [
+                      //name
+                      TextFormField(
+                          initialValue: "",
+                          decoration: InputDecoration(labelText: "Name"),
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) {
+                            FocusScope.of(context)
+                                .requestFocus(_preparationTimeFocusNode);
+                          },
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter recipe name';
+                            }
+                            return null;
+                          }),
 
-                // preparation time
-                TextFormField(
-                  initialValue: "",
-                  decoration: InputDecoration(labelText: 'Preparation time'),
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.number,
-                  focusNode: _preparationTimeFocusNode,
-                  onFieldSubmitted: (_) {
-                    FocusScope.of(context).requestFocus(_descriptionFocusNode);
-                  },
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Please enter a preparation time in minutes.';
-                    }
-                    if (double.tryParse(value) == null) {
-                      return 'Please enter a valid number.';
-                    }
-                    if (double.parse(value) <= 0) {
-                      return 'Please enter a number greater than zero.';
-                    }
-                    return null;
-                  },
-                  onSaved: null,
-                ),
+                      // preparation time
+                      TextFormField(
+                        initialValue: "",
+                        decoration:
+                            InputDecoration(labelText: 'Preparation time'),
+                        textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.number,
+                        focusNode: _preparationTimeFocusNode,
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context)
+                              .requestFocus(_descriptionFocusNode);
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter a preparation time in minutes.';
+                          }
+                          if (double.tryParse(value) == null) {
+                            return 'Please enter a valid number.';
+                          }
+                          if (double.parse(value) <= 0) {
+                            return 'Please enter a number greater than zero.';
+                          }
+                          return null;
+                        },
+                        onSaved: null,
+                      ),
 
-                //description
-                TextFormField(
-                  initialValue: "",
-                  decoration: InputDecoration(labelText: 'Description'),
-                  maxLines: 5,
-                  keyboardType: TextInputType.multiline,
-                  focusNode: _descriptionFocusNode,
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Please enter a description.';
-                    }
-                    if (value.length < 10) {
-                      return 'Should be at least 10 characters long.';
-                    }
-                    return null;
-                  },
-                  onSaved: null,
+                      //description
+                      TextFormField(
+                        initialValue: "",
+                        decoration: InputDecoration(labelText: 'Description'),
+                        maxLines: 5,
+                        keyboardType: TextInputType.multiline,
+                        focusNode: _descriptionFocusNode,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter a description.';
+                          }
+                          if (value.length < 10) {
+                            return 'Should be at least 10 characters long.';
+                          }
+                          return null;
+                        },
+                        onSaved: null,
+                      ),
+                    ],
+                  ),
                 ),
 
                 // image picker
+                Card(
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Photos:",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: 17),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          IconButton(
+                              icon: Icon(Icons.photo_library),
+                              onPressed: _imgFromGallery),
+                          IconButton(
+                              icon: Icon(Icons.photo_camera),
+                              onPressed: _imgFromCamera)
+                        ],
+                      ),
+                      ...addedPhotos.map((photoFile) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            child: Image.file(
+                              photoFile,
+                              fit: BoxFit.fitHeight,
+                            ),
+                          ),
+                        );
+                      })
+                    ],
+                  ),
+                ),
 
                 //  ingredients
+                Card(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "Ingredients:",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(fontSize: 17),
+                            ),
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.add),
+                              onPressed: () {
+                                _addIngredientFiled(context);
+                              }),
+                        ],
+                      ),
+                      // addedIngredients
+                    ],
+                  ),
+                ),
 
                 //  confectionery types
                 Padding(
@@ -124,14 +216,14 @@ class _RecipeCreationState extends State<RecipeCreation> {
                           child: Text(
                             "Confectionery types:",
                             textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(fontSize: 17),
                           ),
                         ),
                         ...availableConfectioneryTypes.map(
                           (confectioneryType) {
                             return CheckboxListTile(
-                              value:
-                                  checkedConfectioneryTypes[confectioneryType.id],
+                              value: checkedConfectioneryTypes[
+                                  confectioneryType.id],
                               title: Text(confectioneryType.name),
                               onChanged: (bool value) {
                                 setState(() {
@@ -159,5 +251,72 @@ class _RecipeCreationState extends State<RecipeCreation> {
       checkedConfectioneryTypes.putIfAbsent(type.id, () => false);
       // checkedConfectioneryTypes[type.id] = false;
     }
+  }
+
+  _imgFromCamera() async {
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.camera, imageQuality: 100);
+
+    setState(() {
+      if (image != null) {
+        addedPhotos.add(image);
+      }
+    });
+  }
+
+  _imgFromGallery() async {
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 100);
+
+    setState(() {
+      if (image != null) {
+        addedPhotos.add(image);
+      }
+    });
+  }
+
+  _addIngredientFiled(BuildContext context) async {
+    ElementOfRecipe elementOfRecipe = ElementOfRecipe(
+        null,
+        2.0,
+        Ingredient(1, "ing1", [Unit(1, "Unit1"), Unit(2, "Unit2")]),
+        Unit(1, "Unit1"),
+        1,
+        1);
+
+    final result = await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("Choose ingredient"),
+        content: Column(
+          children: [
+            TextField(
+              controller: _ingredientCreationIngredientName,
+              decoration: InputDecoration(hintText: "Ingredient name"),
+            ),
+            TextField(
+              controller: _ingredientCreationAmount,
+              decoration: InputDecoration(hintText: "Amount"),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: _ingredientCreationUnit,
+              decoration: InputDecoration(hintText: "Unit"),
+            ),
+          ],
+        ),
+        actions: [
+          FlatButton(
+              onPressed: () => Navigator.of(ctx).pop(elementOfRecipe),
+              child: Text("Save")),
+          FlatButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text("Cancel")),
+        ],
+      ),
+    );
+
+    print(
+        "Wynik: \n Name: ${_ingredientCreationIngredientName.value.text} \n Amount: ${_ingredientCreationAmount.value.text} \n Unit: ${_ingredientCreationUnit.value.text}");
   }
 }
