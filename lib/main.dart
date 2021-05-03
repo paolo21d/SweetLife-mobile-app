@@ -52,8 +52,8 @@ class SweetLifeApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white),
       // home: RecipeList(recDesc),
       // home: RecipeDetails(),
-      // home: RecipeCreation(),
-      home: RecipeSearch(recDesc),
+      home: RecipeCreation(),
+      // home: RecipeSearch(recDesc),
     );
   }
 }

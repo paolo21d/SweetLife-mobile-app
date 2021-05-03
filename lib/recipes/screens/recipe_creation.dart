@@ -4,6 +4,7 @@ import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/element_of_recipe.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/unit.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -170,7 +171,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
                               onPressed: _imgFromCamera)
                         ],
                       ),
-                      ...addedPhotos.map((photoFile) {
+                      /*...addedPhotos.map((photoFile) {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: ClipRRect(
@@ -181,7 +182,25 @@ class _RecipeCreationState extends State<RecipeCreation> {
                             ),
                           ),
                         );
-                      })
+                      })*/
+                      addedPhotos.isEmpty
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("No photo"),
+                              ),
+                            )
+                          : Container(
+                              child: CarouselSlider(
+                              options: CarouselOptions(
+                                aspectRatio: 1.0,
+                                enlargeCenterPage: true,
+                                enableInfiniteScroll: false,
+                                pageViewKey:
+                                    PageStorageKey<String>('carousel_slider'),
+                              ),
+                              items: imageSliders(context),
+                            ))
                     ],
                   ),
                 ),
@@ -304,6 +323,67 @@ class _RecipeCreationState extends State<RecipeCreation> {
 
   Unit _getUnitByName(String unitName) {
     return availableUnits.firstWhere((element) => element.name == unitName);
+  }
+
+  imageSliders(BuildContext context) {
+    return addedPhotos.map((photoFile) {
+      return Container(
+        child: Container(
+          margin: EdgeInsets.all(5.0),
+          child: ClipRRect(
+              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              child: Stack(
+                children: <Widget>[
+                  // Image.network(item, fit: BoxFit.cover, width: 1000.0),
+                  Image.file(
+                    photoFile,
+                    fit: BoxFit.fitHeight,
+                    width: 1000,
+                  ),
+                  Positioned(
+                    bottom: 0.0,
+                    left: 0.0,
+                    right: 0.0,
+                    child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromARGB(100, 0, 0, 0),
+                              Color.fromARGB(0, 0, 0, 0)
+                            ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                          ),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 5.0, horizontal: 20.0),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              addedPhotos.removeWhere(
+                                  (element) => element == photoFile);
+                            });
+                          },
+                        )
+                        /*Text(
+                        'No. ${imgList.indexOf(item)} image',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),*/
+                        ),
+                  ),
+                ],
+              )),
+        ),
+      );
+    }).toList();
   }
 
   _addIngredientFiled(BuildContext context) async {
