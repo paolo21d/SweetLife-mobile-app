@@ -29,6 +29,9 @@ class _RecipeCreationState extends State<RecipeCreation> {
   TextEditingController _ingredientCreationAmount = TextEditingController();
   TextEditingController _ingredientCreationUnit = TextEditingController();
 
+  String choosedIngredientName;
+  String choosedUnitName;
+
   //      MOCKS!!
   List<ConfectioneryType> availableConfectioneryTypes = [
     ConfectioneryType(1, "Torty"),
@@ -42,6 +45,8 @@ class _RecipeCreationState extends State<RecipeCreation> {
     Ingredient(
         4, "ing4", [Unit(1, "Unit1"), Unit(2, "Unit2"), Unit(3, "Unit3")]),
   ];
+
+  String dropdownValue = 'One';
 
   @override
   void didChangeDependencies() {
@@ -275,6 +280,11 @@ class _RecipeCreationState extends State<RecipeCreation> {
     });
   }
 
+  Ingredient _getIngredientByName(String ingredientName) {
+    return availableIngredients
+        .firstWhere((element) => element.name == ingredientName);
+  }
+
   _addIngredientFiled(BuildContext context) async {
     ElementOfRecipe elementOfRecipe = ElementOfRecipe(
         null,
@@ -284,26 +294,84 @@ class _RecipeCreationState extends State<RecipeCreation> {
         1,
         1);
 
+    setState(() {
+      choosedIngredientName = availableIngredients[0].name;
+      choosedUnitName = null;
+    });
+
     final result = await showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("Choose ingredient"),
-        content: Column(
-          children: [
-            TextField(
-              controller: _ingredientCreationIngredientName,
-              decoration: InputDecoration(hintText: "Ingredient name"),
-            ),
-            TextField(
-              controller: _ingredientCreationAmount,
-              decoration: InputDecoration(hintText: "Amount"),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _ingredientCreationUnit,
-              decoration: InputDecoration(hintText: "Unit"),
-            ),
-          ],
+        title: Text("Add ingredient"),
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /*DropdownButton<String>(
+                value: dropdownValue,
+                icon: const Icon(Icons.arrow_downward),
+                iconSize: 24,
+                elevation: 16,
+                style: const TextStyle(color: Colors.deepPurple),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    dropdownValue = newValue;
+                  });
+                },
+                items: <String>['One', 'Two', 'Free', 'Four']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),*/
+                DropdownButton(
+                    value: choosedIngredientName,
+                    items: availableIngredients.map((ingredient) {
+                      return new DropdownMenuItem(
+                        value: ingredient.name,
+                        child: Text(ingredient.name),
+                      );
+                    }).toList(),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        choosedIngredientName = newValue;
+                        choosedUnitName =
+                            _getIngredientByName(choosedIngredientName)
+                                .availableUnits[0]
+                                .name;
+                      });
+                    }),
+                DropdownButton(
+                  value: choosedUnitName,
+                  items: _getIngredientByName(choosedIngredientName)
+                      .availableUnits
+                      .map((unit) {
+                    return DropdownMenuItem(
+                      value: unit.name,
+                      child: Text(unit.name),
+                    );
+                  }).toList(),
+                  onChanged: null,
+                ),
+                TextField(
+                  controller: _ingredientCreationAmount,
+                  decoration: InputDecoration(hintText: "Amount"),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: _ingredientCreationUnit,
+                  decoration: InputDecoration(hintText: "Unit"),
+                ),
+              ],
+            );
+          },
         ),
         actions: [
           FlatButton(
@@ -316,7 +384,6 @@ class _RecipeCreationState extends State<RecipeCreation> {
       ),
     );
 
-    print(
-        "Wynik: \n Name: ${_ingredientCreationIngredientName.value.text} \n Amount: ${_ingredientCreationAmount.value.text} \n Unit: ${_ingredientCreationUnit.value.text}");
+    // print("Wynik: \n Name: ${_ingredientCreationIngredientName.value.text} \n Amount: ${_ingredientCreationAmount.value.text} \n Unit: ${_ingredientCreationUnit.value.text}");
   }
 }
