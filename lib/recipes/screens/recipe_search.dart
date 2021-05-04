@@ -2,8 +2,10 @@ import 'package:SweetLife/app_drawer.dart';
 import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/recipe_description.dart';
+import 'package:SweetLife/providers/recipes_provider.dart';
 import 'package:SweetLife/recipes/widgets/recipe_list_item.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RecipeSearch extends StatefulWidget {
   static const routeName = '/recipe-search';
@@ -30,12 +32,7 @@ class _RecipeSearchState extends State<RecipeSearch> {
     ConfectioneryType(2, "Lody"),
     ConfectioneryType(3, "Rurki"),
   ];
-  List<Ingredient> availableIngredients = [
-    Ingredient("1", "ing1"),
-    Ingredient("2", "ing2"),
-    Ingredient("3", "ing3"),
-    Ingredient("4", "ing4"),
-  ];
+  List<Ingredient> availableIngredients = [];
 
   @override
   void didChangeDependencies() {
@@ -44,6 +41,13 @@ class _RecipeSearchState extends State<RecipeSearch> {
       _prepareChosedConfectioneryTypes();
       _prepareChosedIngredients();
     }
+
+    Provider.of<RecipesProvider>(context).allIngredients.then((value) {
+      setState(() {
+        availableIngredients = value;
+      });
+    });
+
     super.didChangeDependencies();
   }
 
@@ -198,11 +202,10 @@ class _RecipeSearchState extends State<RecipeSearch> {
       ),
     );
 
-    if(result) {
+    if (result) {
       String searchText = _searchText.value.text;
-      double maxPreparationTime = double.parse(_searchPreparationTime.value.text);
-
-
+      double maxPreparationTime =
+          double.parse(_searchPreparationTime.value.text);
     }
   }
 }

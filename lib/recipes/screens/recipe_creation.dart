@@ -40,18 +40,8 @@ class _RecipeCreationState extends State<RecipeCreation> {
     ConfectioneryType(2, "Lody"),
     ConfectioneryType(3, "Rurki"),
   ];
-  List<Ingredient> availableIngredients = [
-    Ingredient("1", "ing1"),
-    Ingredient("2", "ing2"),
-    Ingredient("3", "ing3"),
-    Ingredient("4", "ing4"),
-  ];
-  List<Unit> availableUnits = [
-    Unit("1", "Unit1"),
-    Unit("2", "Unit2"),
-    Unit("3", "Unit3"),
-    Unit("4", "Unit4"),
-  ];
+  List<Ingredient> availableIngredients = [];
+  List<Unit> availableUnits = [];
 
   String dropdownValue = 'One';
 
@@ -64,19 +54,24 @@ class _RecipeCreationState extends State<RecipeCreation> {
       _isInited = true;
     }
 
+    Provider.of<RecipesProvider>(context).allIngredients.then((value) {
+      setState(() {
+        availableIngredients = value;
+      });
+    });
+
+    Provider.of<RecipesProvider>(context).allUnits.then((value) {
+      setState(() {
+        availableUnits = value;
+      });
+    });
+
     super.didChangeDependencies();
   }
 
   //nazwa, czas przygotowania, opis, image picker, skladniki, typ przepisu
   @override
   Widget build(BuildContext context) {
-    Provider.of<RecipesProvider>(context)
-        .allIngredients
-        .then((value) => print(value));
-
-    Provider.of<RecipesProvider>(context)
-        .allUnits
-        .then((value) => print(value));
 
     return Scaffold(
         appBar: AppBar(

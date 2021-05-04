@@ -1,5 +1,6 @@
 import 'package:SweetLife/app_drawer.dart';
 import 'package:SweetLife/model/shopping_list_description.dart';
+import 'package:SweetLife/shopping_list/screens/shopping_list_creation.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -96,6 +97,7 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           //TODO redirect to ShoppingListCreation screen
+          Navigator.of(context).pushNamed(ShoppingListCreation.routeName);
         },
         child: Icon(Icons.add),
         backgroundColor: Theme.of(context).accentColor,
