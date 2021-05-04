@@ -5,6 +5,8 @@ import 'package:SweetLife/model/unit.dart';
 import 'package:flutter/material.dart';
 
 class ShoppingListDetails extends StatefulWidget {
+  static const routeName = '/shopping-list-details';
+
   ShoppingListDetails({Key key}) : super(key: key);
 
   @override

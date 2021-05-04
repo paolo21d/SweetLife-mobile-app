@@ -1,9 +1,12 @@
 import 'package:SweetLife/app_drawer.dart';
 import 'package:SweetLife/model/shopping_list_description.dart';
+import 'package:SweetLife/shopping_list/screens/shopping_list_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ShoppingListOverview extends StatefulWidget {
+  static const routeName = '/shopping-list-overview';
+
   @override
   _ShoppingListOverviewState createState() => _ShoppingListOverviewState();
 }
@@ -47,13 +50,19 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
                     SizedBox(
                       height: 5,
                     ),
-                    Text("Created: ${DateFormat.yMMMd().format(shoppingLists[index].auditCD)}")
+                    Text(
+                        "Created: ${DateFormat.yMMMd().format(shoppingLists[index].auditCD)}")
                   ],
                 ),
               ),
               trailing: TextButton(
                 child: Text("Details"),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    ShoppingListDetails.routeName,
+                    arguments: shoppingLists[index].id,
+                  );
+                },
               ),
             ),
             elevation: 10,

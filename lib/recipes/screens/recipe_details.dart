@@ -12,6 +12,8 @@ import 'package:intl/intl.dart';
 import '../../app_drawer.dart';
 
 class RecipeDetails extends StatelessWidget {
+  static const routeName = '/recipe-details';
+
   Recipe recipe = Recipe(
       1,
       "Simple White Cake",
@@ -49,9 +51,9 @@ class RecipeDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Recipe List"),
+        title: Text("Recipe Details"),
       ),
-      drawer: AppDrawer(),
+      // drawer: AppDrawer(),
       body: SingleChildScrollView(
         child: Column(
           children: [

@@ -1,4 +1,5 @@
 import 'package:SweetLife/model/recipe_description.dart';
+import 'package:SweetLife/recipes/screens/recipe_details.dart';
 import 'package:flutter/material.dart';
 
 class RecipeListItem extends StatelessWidget {
@@ -16,13 +17,21 @@ class RecipeListItem extends StatelessWidget {
       ),
       child: Column(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-            child: Image.network(
-              recipeDescription.photo,
-              fit: BoxFit.cover,
+          GestureDetector(
+            child: ClipRRect(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+              child: Image.network(
+                recipeDescription.photo,
+                fit: BoxFit.cover,
+              ),
             ),
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                RecipeDetails.routeName,
+                arguments: recipeDescription.id,
+              );
+            },
           ),
           Padding(
             padding: EdgeInsets.all(15),

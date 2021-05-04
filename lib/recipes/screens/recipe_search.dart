@@ -6,6 +6,8 @@ import 'package:SweetLife/recipes/widgets/recipe_list_item.dart';
 import 'package:flutter/material.dart';
 
 class RecipeSearch extends StatefulWidget {
+  static const routeName = '/recipe-search';
+
   final List<RecipeDescription> recipeDescriptions;
 
   const RecipeSearch(this.recipeDescriptions);

@@ -1,5 +1,11 @@
 import 'package:SweetLife/model/recipe_description.dart';
+import 'package:SweetLife/recipes/screens/recipe_creation.dart';
+import 'package:SweetLife/recipes/screens/recipe_details.dart';
+import 'package:SweetLife/recipes/screens/recipe_list.dart';
+import 'package:SweetLife/recipes/screens/recipe_search.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_creation.dart';
+import 'package:SweetLife/shopping_list/screens/shopping_list_details.dart';
+import 'package:SweetLife/shopping_list/screens/shopping_list_overview.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -48,12 +54,20 @@ class SweetLifeApp extends StatelessWidget {
           accentColor: Colors.amberAccent,
           visualDensity: VisualDensity.adaptivePlatformDensity,
           scaffoldBackgroundColor: Colors.white),
-      // home: RecipeList(recDesc),
+      home: RecipeSearch(recDesc),
+      routes: {
+        RecipeCreation.routeName: (ctx) => RecipeCreation(),
+        RecipeDetails.routeName: (ctx) => RecipeDetails(),
+        RecipeSearch.routeName: (ctx) => RecipeSearch(recDesc),
+        ShoppingListCreation.routeName: (ctx) => ShoppingListCreation(),
+        ShoppingListDetails.routeName: (ctx) => ShoppingListDetails(),
+        ShoppingListOverview.routeName: (ctx) => ShoppingListOverview(),
+      },
       // home: RecipeDetails(),
       // home: RecipeCreation(),
       // home: RecipeSearch(recDesc),
       // home: ShoppingListOverview(),
-      home: ShoppingListCreation(),
+      // home: ShoppingListCreation(),
       // home: ShoppingListDetails(),
     );
   }

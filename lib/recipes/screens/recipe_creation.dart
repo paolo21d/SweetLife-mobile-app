@@ -11,6 +11,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../app_drawer.dart';
 
 class RecipeCreation extends StatefulWidget {
+  static const routeName = '/recipe-creation';
+
   @override
   _RecipeCreationState createState() => _RecipeCreationState();
 }
