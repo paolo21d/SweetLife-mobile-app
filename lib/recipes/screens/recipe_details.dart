@@ -30,10 +30,10 @@ class RecipeDetails extends StatelessWidget {
             "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fimages.media-allrecipes.com%2Fuserphotos%2F8368810.jpg&q=85")
       ],
       [
-        ElementOfRecipe(1, 0.5, Ingredient(1, "butter"), Unit(1, "cups"), 1, 1),
-        ElementOfRecipe(2, 2, Ingredient(2, "eggs"), Unit(3, "pieces"), 2, 3),
-        ElementOfRecipe(3, 1.5, Ingredient(3, "flour"), Unit(1, "cups"), 3, 1),
-        ElementOfRecipe(4, 0.5, Ingredient(4, "milk"), Unit(1, "cups"), 4, 1),
+        ElementOfRecipe(1, 0.5, Ingredient("1", "butter"), Unit("1", "cups"), "1", "1"),
+        ElementOfRecipe(2, 2, Ingredient("2", "eggs"), Unit("3", "pieces"), "2", "3"),
+        ElementOfRecipe(3, 1.5, Ingredient("3", "flour"), Unit("1", "cups"), "3", "1"),
+        ElementOfRecipe(4, 0.5, Ingredient("4", "milk"), Unit("1", "cups"), "4", "1"),
       ],
       [
         ConfectioneryType(1, "confType1"),

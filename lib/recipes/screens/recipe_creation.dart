@@ -4,9 +4,11 @@ import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/element_of_recipe.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/unit.dart';
+import 'package:SweetLife/providers/recipes_provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../../app_drawer.dart';
 
@@ -39,16 +41,16 @@ class _RecipeCreationState extends State<RecipeCreation> {
     ConfectioneryType(3, "Rurki"),
   ];
   List<Ingredient> availableIngredients = [
-    Ingredient(1, "ing1"),
-    Ingredient(2, "ing2"),
-    Ingredient(3, "ing3"),
-    Ingredient(4, "ing4"),
+    Ingredient("1", "ing1"),
+    Ingredient("2", "ing2"),
+    Ingredient("3", "ing3"),
+    Ingredient("4", "ing4"),
   ];
   List<Unit> availableUnits = [
-    Unit(1, "Unit1"),
-    Unit(2, "Unit2"),
-    Unit(3, "Unit3"),
-    Unit(4, "Unit4"),
+    Unit("1", "Unit1"),
+    Unit("2", "Unit2"),
+    Unit("3", "Unit3"),
+    Unit("4", "Unit4"),
   ];
 
   String dropdownValue = 'One';
@@ -61,12 +63,21 @@ class _RecipeCreationState extends State<RecipeCreation> {
       _prepareCheckedConfectioneryTypes();
       _isInited = true;
     }
+
     super.didChangeDependencies();
   }
 
   //nazwa, czas przygotowania, opis, image picker, skladniki, typ przepisu
   @override
   Widget build(BuildContext context) {
+    Provider.of<RecipesProvider>(context)
+        .allIngredients
+        .then((value) => print(value));
+
+    Provider.of<RecipesProvider>(context)
+        .allUnits
+        .then((value) => print(value));
+
     return Scaffold(
         appBar: AppBar(
           title: Text("Recipe Creation"),

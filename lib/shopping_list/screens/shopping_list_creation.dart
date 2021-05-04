@@ -24,16 +24,16 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
 
   //      MOCKS!!
   List<Ingredient> availableIngredients = [
-    Ingredient(1, "ing1"),
-    Ingredient(2, "ing2"),
-    Ingredient(3, "ing3"),
-    Ingredient(4, "ing4"),
+    Ingredient("1", "ing1"),
+    Ingredient("2", "ing2"),
+    Ingredient("3", "ing3"),
+    Ingredient("4", "ing4"),
   ];
   List<Unit> availableUnits = [
-    Unit(1, "Unit1"),
-    Unit(2, "Unit2"),
-    Unit(3, "Unit3"),
-    Unit(4, "Unit4"),
+    Unit("1", "Unit1"),
+    Unit("2", "Unit2"),
+    Unit("3", "Unit3"),
+    Unit("4", "Unit4"),
   ];
 
   @override

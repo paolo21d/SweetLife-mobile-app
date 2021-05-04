@@ -19,33 +19,23 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
       "my first shopping list",
       [
         ShoppingListElement(
-            1, 5, Ingredient(1, "ing1"), Unit(1, "unit1"), true),
+            1, 5, Ingredient("1", "ing1"), Unit("1", "unit1"), true),
         ShoppingListElement(
-            2, 12, Ingredient(2, "ing2"), Unit(1, "unit1"), true),
+            2, 12, Ingredient("2", "ing2"), Unit("1", "unit1"), true),
         ShoppingListElement(
-            3, 2000, Ingredient(3, "ing3"), Unit(2, "unit2"), false),
+            3, 2000, Ingredient("3", "ing3"), Unit("2", "unit2"), false),
         ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
+            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
         ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
+            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
         ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
+            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
         ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
+            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
         ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
+            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
         ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient(4, "ing4"), Unit(1, "unit1"), true),
+            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
       ],
       DateTime(2021),
       1);
@@ -87,11 +77,18 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
                       onChanged: (bool value) {
                         setState(() {
                           element.active = value;
-                        //  TODO send request to change active state of ingredient
+                          //  TODO send request to change active state of ingredient
                         });
                       },
                       controlAffinity: ListTileControlAffinity.leading,
-                      title: element.active? Text(element.ingredient.name) : Text(element.ingredient.name, style: TextStyle(decoration: TextDecoration.lineThrough, color: Colors.grey),),
+                      title: element.active
+                          ? Text(element.ingredient.name)
+                          : Text(
+                              element.ingredient.name,
+                              style: TextStyle(
+                                  decoration: TextDecoration.lineThrough,
+                                  color: Colors.grey),
+                            ),
                       subtitle: Text("${element.amount} ${element.unit.name}"),
                       secondary: IconButton(
                         icon: Icon(Icons.delete),

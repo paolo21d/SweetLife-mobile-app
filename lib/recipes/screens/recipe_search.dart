@@ -19,7 +19,7 @@ class RecipeSearch extends StatefulWidget {
 class _RecipeSearchState extends State<RecipeSearch> {
   TextEditingController _searchText = TextEditingController();
   TextEditingController _searchPreparationTime = TextEditingController();
-  Map<int, bool> choosedIngredient = <int, bool>{};
+  Map<String, bool> choosedIngredient = <String, bool>{};
   Map<int, bool> choosedConfectioneryType = <int, bool>{};
 
   bool _isInited = false;
@@ -31,10 +31,10 @@ class _RecipeSearchState extends State<RecipeSearch> {
     ConfectioneryType(3, "Rurki"),
   ];
   List<Ingredient> availableIngredients = [
-    Ingredient(1, "ing1"),
-    Ingredient(2, "ing2"),
-    Ingredient(3, "ing3"),
-    Ingredient(4, "ing4"),
+    Ingredient("1", "ing1"),
+    Ingredient("2", "ing2"),
+    Ingredient("3", "ing3"),
+    Ingredient("4", "ing4"),
   ];
 
   @override
@@ -76,7 +76,7 @@ class _RecipeSearchState extends State<RecipeSearch> {
   }
 
   void _prepareChosedIngredients() {
-    choosedIngredient = <int, bool>{};
+    choosedIngredient = <String, bool>{};
     for (Ingredient ingredient in availableIngredients) {
       choosedIngredient.putIfAbsent(ingredient.id, () => false);
     }

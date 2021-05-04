@@ -8,8 +8,8 @@ class ElementOfRecipe {
   final Ingredient ingredient;
   final Unit unit;
 
-  final int ingredientId;
-  final int unitId;
+  final String ingredientId;
+  final String unitId;
 
   ElementOfRecipe(this.id, this.amount, this.ingredient, this.unit,
       this.ingredientId, this.unitId);
