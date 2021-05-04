@@ -22,16 +22,12 @@ class _RecipeSearchState extends State<RecipeSearch> {
   TextEditingController _searchText = TextEditingController();
   TextEditingController _searchPreparationTime = TextEditingController();
   Map<String, bool> choosedIngredient = <String, bool>{};
-  Map<int, bool> choosedConfectioneryType = <int, bool>{};
+  Map<String, bool> choosedConfectioneryType = <String, bool>{};
 
   bool _isInited = false;
 
   //    MOCKS!!!!
-  List<ConfectioneryType> availableConfectioneryTypes = [
-    ConfectioneryType(1, "Torty"),
-    ConfectioneryType(2, "Lody"),
-    ConfectioneryType(3, "Rurki"),
-  ];
+  List<ConfectioneryType> availableConfectioneryTypes = [];
   List<Ingredient> availableIngredients = [];
 
   @override
@@ -73,7 +69,7 @@ class _RecipeSearchState extends State<RecipeSearch> {
   }
 
   void _prepareChosedConfectioneryTypes() {
-    choosedConfectioneryType = <int, bool>{};
+    choosedConfectioneryType = <String, bool>{};
     for (ConfectioneryType type in availableConfectioneryTypes) {
       choosedConfectioneryType.putIfAbsent(type.id, () => false);
     }

@@ -36,8 +36,8 @@ class RecipeDetails extends StatelessWidget {
         ElementOfRecipe(4, 0.5, Ingredient("4", "milk"), Unit("1", "cups"), "4", "1"),
       ],
       [
-        ConfectioneryType(1, "confType1"),
-        ConfectioneryType(2, "confType2"),
+        ConfectioneryType("1", "confType1"),
+        ConfectioneryType("2", "confType2"),
       ],
       [
         RecipeComment(1, "comment 1", DateTime(2021), 1, "login1", 1),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,18 @@ class RecipesProvider extends ChangeNotifier {
       print(units.last);
     });
     return units;
+  }
 
+  Future<List<ConfectioneryType>> get allConfectioneryTypes async{
+    var url = Uri.https(apiURL, "/confectionery-types.json");
+    final response = await http.get(url);
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+
+    List<ConfectioneryType> confectioneryTypes = [];
+    extractedData.forEach((typeId, typeData) {
+      confectioneryTypes.add(ConfectioneryType(typeId, typeData['name']));
+      print(confectioneryTypes.last);
+    });
+    return confectioneryTypes;
   }
 }

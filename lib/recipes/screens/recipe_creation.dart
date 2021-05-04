@@ -25,7 +25,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
 
   final _form = GlobalKey<FormState>();
   bool _isInited = false;
-  Map<int, bool> checkedConfectioneryTypes = <int, bool>{};
+  Map<String, bool> checkedConfectioneryTypes = <String, bool>{};
   List<File> addedPhotos = <File>[];
   List<ElementOfRecipe> addedIngredients = [];
 
@@ -35,11 +35,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
   String choosedUnitName;
 
   //      MOCKS!!
-  List<ConfectioneryType> availableConfectioneryTypes = [
-    ConfectioneryType(1, "Torty"),
-    ConfectioneryType(2, "Lody"),
-    ConfectioneryType(3, "Rurki"),
-  ];
+  List<ConfectioneryType> availableConfectioneryTypes = [];
   List<Ingredient> availableIngredients = [];
   List<Unit> availableUnits = [];
 
@@ -63,6 +59,12 @@ class _RecipeCreationState extends State<RecipeCreation> {
     Provider.of<RecipesProvider>(context).allUnits.then((value) {
       setState(() {
         availableUnits = value;
+      });
+    });
+
+    Provider.of<RecipesProvider>(context).allConfectioneryTypes.then((value) {
+      setState(() {
+        availableConfectioneryTypes = value;
       });
     });
 
@@ -295,7 +297,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
   }
 
   void _prepareCheckedConfectioneryTypes() {
-    checkedConfectioneryTypes = <int, bool>{};
+    checkedConfectioneryTypes = <String, bool>{};
     for (ConfectioneryType type in availableConfectioneryTypes) {
       checkedConfectioneryTypes.putIfAbsent(type.id, () => false);
       // checkedConfectioneryTypes[type.id] = false;
