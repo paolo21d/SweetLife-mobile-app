@@ -1,16 +1,25 @@
-import 'package:SweetLife/model/unit.dart';
-
-import 'ingredient.dart';
+import 'dart:convert';
 
 class ElementOfRecipe {
-  final int id;
   final double amount;
-  final Ingredient ingredient;
-  final Unit unit;
+  final String ingredientName;
+  final String unitName;
 
-  final String ingredientId;
-  final String unitId;
+  ElementOfRecipe(this.ingredientName, this.amount, this.unitName);
 
-  ElementOfRecipe(this.id, this.amount, this.ingredient, this.unit,
-      this.ingredientId, this.unitId);
+  String toJson() {
+    return json.encode({
+      "amount": this.amount,
+      "ingredientName": this.ingredientName,
+      "unitName": this.unitName
+    });
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "amount": this.amount,
+      "ingredientName": this.ingredientName,
+      "unitName": this.unitName
+    };
+  }
 }

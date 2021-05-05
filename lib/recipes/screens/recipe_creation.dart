@@ -74,7 +74,6 @@ class _RecipeCreationState extends State<RecipeCreation> {
   //nazwa, czas przygotowania, opis, image picker, skladniki, typ przepisu
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         appBar: AppBar(
           title: Text("Recipe Creation"),
@@ -238,9 +237,9 @@ class _RecipeCreationState extends State<RecipeCreation> {
                       ),
                       ...addedIngredients.map((ingredient) {
                         return ListTile(
-                          title: Text(ingredient.ingredient.name),
-                          subtitle: Text(
-                              "${ingredient.amount} ${ingredient.unit.name}"),
+                          title: Text(ingredient.ingredientName),
+                          subtitle:
+                              Text("${ingredient.amount} ${ingredient.unitName}"),
                           trailing: IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () {
@@ -502,8 +501,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
         Ingredient ingredient = _getIngredientByName(choosedIngredientName);
         Unit unit = _getUnitByName(choosedUnitName);
         double amount = double.parse(_ingredientCreationAmount.value.text);
-        addedIngredients.add(ElementOfRecipe(
-            null, amount, ingredient, unit, ingredient.id, unit.id));
+        addedIngredients.add(ElementOfRecipe(ingredient.name, amount, unit.name));
       }
       choosedIngredientName = availableIngredients[0].name;
       choosedUnitName = availableUnits[0].name;

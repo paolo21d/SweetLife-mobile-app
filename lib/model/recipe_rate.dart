@@ -1,15 +1,15 @@
 import 'dart:convert';
 
-class RecipeComment {
-  final String content;
+class RecipeRate {
+  final double rate;
   final DateTime auditCD;
   final String userLogin;
 
-  RecipeComment(this.content, this.auditCD, this.userLogin);
+  RecipeRate(this.rate, this.auditCD, this.userLogin);
 
   String toJson() {
     return json.encode({
-      "content": this.content,
+      "rate": this.rate,
       "auditCD": this.auditCD.toIso8601String(),
       "userLogin": this.userLogin
     });
@@ -17,7 +17,7 @@ class RecipeComment {
 
   Map<String, dynamic> toMap() {
     return {
-      "content": this.content,
+      "rate": this.rate,
       "auditCD": this.auditCD.toIso8601String(),
       "userLogin": this.userLogin
     };
