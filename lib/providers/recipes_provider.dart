@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
+import 'package:SweetLife/model/recipe.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -12,9 +13,43 @@ class RecipesProvider extends ChangeNotifier {
   final String apiURL =
       "sweetlife-api-default-rtdb.europe-west1.firebasedatabase.app";
 
+  List<Recipe> _fetchedRecipes;
+  List<Ingredient> _allFetchedIngredients;
+  List<Unit> _allFetchedUnits;
+  List<ConfectioneryType> _allFetchedConfectioneryTypes;
+
   RecipesProvider(this.authToken, this.userId);
 
-  Future<List<Ingredient>> get allIngredients async {
+  List<Ingredient> get allIngredients {
+    return [..._allFetchedIngredients];
+  }
+
+  List<Unit> get allUnits {
+    return [..._allFetchedUnits];
+  }
+
+  List<ConfectioneryType> get allConfectioneryTypes {
+    return [..._allFetchedConfectioneryTypes];
+  }
+
+  Future<String> createRecipe(Recipe recipe) async {
+    var url = Uri.https(apiURL, "/recipes.json");
+    final response = await http.post(url, body: recipe.toJson());
+
+    return (response.body as Map<String, dynamic>)["name"];
+  }
+
+  Future<void> fetchDataToRecipeCreation() async {
+    await Future.wait([
+      _fetchAllIngredients(),
+      _fetchAllUnits(),
+      _fetchAllConfectioneryTypes()
+    ]);
+
+    notifyListeners();
+  }
+
+  Future<void> _fetchAllIngredients() async {
     var url = Uri.https(apiURL, "/ingredients.json");
     final response = await http.get(url);
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -22,12 +57,13 @@ class RecipesProvider extends ChangeNotifier {
     List<Ingredient> ingredients = [];
     extractedData.forEach((ingredientId, ingredientData) {
       ingredients.add(Ingredient(ingredientId, ingredientData['name']));
-      // print(ingredients.last);
     });
-    return ingredients;
+    _allFetchedIngredients = ingredients;
+
+    // extractedData.entries.map((entry) => Ingredient(entry.key, entry.value["name"])).toList();
   }
 
-  Future<List<Unit>> get allUnits async{
+  Future<void> _fetchAllUnits() async {
     var url = Uri.https(apiURL, "/units.json");
     final response = await http.get(url);
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -37,10 +73,10 @@ class RecipesProvider extends ChangeNotifier {
       units.add(Unit(unitId, unitData['name']));
       print(units.last);
     });
-    return units;
+    _allFetchedUnits = units;
   }
 
-  Future<List<ConfectioneryType>> get allConfectioneryTypes async{
+  Future<void> _fetchAllConfectioneryTypes() async {
     var url = Uri.https(apiURL, "/confectionery-types.json");
     final response = await http.get(url);
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -50,6 +86,6 @@ class RecipesProvider extends ChangeNotifier {
       confectioneryTypes.add(ConfectioneryType(typeId, typeData['name']));
       print(confectioneryTypes.last);
     });
-    return confectioneryTypes;
+    _allFetchedConfectioneryTypes = confectioneryTypes;
   }
 }
