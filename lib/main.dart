@@ -17,7 +17,7 @@ void main() {
 
 class SweetLifeApp extends StatelessWidget {
   // This widget is the root of your application.
-  final RecipeDescription rec1 = RecipeDescription(
+/*  final RecipeDescription rec1 = RecipeDescription(
       1,
       "Rec1",
       "desc1",
@@ -33,34 +33,29 @@ class SweetLifeApp extends StatelessWidget {
       "https://assets.tmecosys.com/image/upload/t_web667x528/img/recipe/ras/Assets/5e057cbe-e64e-484b-b8e2-19c9c74ddcd2/Derivates/0702d718-d752-447c-a1b2-c8b35fc71643.jpg",
       2.5,
       20);
-  List<RecipeDescription> recDesc = [];
+  List<RecipeDescription> recDesc = [];*/
 
   @override
   Widget build(BuildContext context) {
-    recDesc.add(rec1);
-    recDesc.add(rec2);
-    recDesc.add(rec1);
-    recDesc.add(rec2);
-    recDesc.add(rec1);
-    recDesc.add(rec2);
-    recDesc.add(rec1);
-    recDesc.add(rec2);
-    recDesc.add(rec1);
-    recDesc.add(rec2);
-    recDesc.add(rec1);
-    recDesc.add(rec2);
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: AuthProvider()),
-        /*ChangeNotifierProxyProvider<AuthProvider, RecipesProvider>(
-          builder: (ctx, auth, _) => RecipesProvider(auth.token, auth.userId),
-        )*/
-        ChangeNotifierProvider.value(
-          value: RecipesProvider("token", "userId"),
+        ChangeNotifierProxyProvider<AuthProvider, RecipesProvider>(
+          create: (_) => RecipesProvider(),
+          update: (ctx, auth, previousProvider) {
+            previousProvider..authToken = auth.token;
+            previousProvider..userId = auth.userId;
+            return previousProvider;
+          },
         ),
-        ChangeNotifierProvider.value(
-          value: ShoppingListsProvider("token", "userId"),
+        ChangeNotifierProxyProvider<AuthProvider, ShoppingListsProvider>(
+          create: (_) => ShoppingListsProvider(),
+          update: (ctx, auth, previousProvider) {
+            previousProvider..authToken = auth.token;
+            previousProvider..userId = auth.userId;
+            return previousProvider;
+          },
         ),
       ],
       child: Consumer<AuthProvider>(
@@ -71,11 +66,11 @@ class SweetLifeApp extends StatelessWidget {
               accentColor: Colors.amberAccent,
               visualDensity: VisualDensity.adaptivePlatformDensity,
               scaffoldBackgroundColor: Colors.white),
-          home: RecipeSearch(recDesc),
+          home: RecipeSearch(),
           routes: {
             RecipeCreation.routeName: (ctx) => RecipeCreation(),
             RecipeDetails.routeName: (ctx) => RecipeDetails(),
-            RecipeSearch.routeName: (ctx) => RecipeSearch(recDesc),
+            RecipeSearch.routeName: (ctx) => RecipeSearch(),
             ShoppingListCreation.routeName: (ctx) => ShoppingListCreation(),
             ShoppingListDetails.routeName: (ctx) => ShoppingListDetails(),
             ShoppingListOverview.routeName: (ctx) => ShoppingListOverview(),

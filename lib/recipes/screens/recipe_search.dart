@@ -1,7 +1,7 @@
 import 'package:SweetLife/app_drawer.dart';
 import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
-import 'package:SweetLife/model/recipe_description.dart';
+import 'package:SweetLife/model/recipe.dart';
 import 'package:SweetLife/providers/recipes_provider.dart';
 import 'package:SweetLife/recipes/widgets/recipe_list_item.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +9,6 @@ import 'package:provider/provider.dart';
 
 class RecipeSearch extends StatefulWidget {
   static const routeName = '/recipe-search';
-
-  final List<RecipeDescription> recipeDescriptions;
-
-  const RecipeSearch(this.recipeDescriptions);
 
   @override
   _RecipeSearchState createState() => _RecipeSearchState();
@@ -25,24 +21,55 @@ class _RecipeSearchState extends State<RecipeSearch> {
   Map<String, bool> choosedConfectioneryType = <String, bool>{};
 
   bool _isInited = false;
+  var _isLoading = false;
 
-  //    MOCKS!!!!
+  // fetched data
   List<ConfectioneryType> availableConfectioneryTypes = [];
   List<Ingredient> availableIngredients = [];
+  List<Recipe> recipesToDisplay = [];
 
   @override
   void didChangeDependencies() {
     if (!_isInited) {
-      _isInited = true;
-      _prepareChosedConfectioneryTypes();
-      _prepareChosedIngredients();
-    }
-
-    Provider.of<RecipesProvider>(context).allIngredients.then((value) {
       setState(() {
-        availableIngredients = value;
+        _isLoading = true;
       });
-    });
+      _isInited = true;
+      // _prepareChosedConfectioneryTypes();
+      // _prepareChosedIngredients();
+
+      //fix from https://stackoverflow.com/questions/63805124/unhandled-exception-a-follows-was-used-after-being-disposed-once-you-have-calle
+      /*Future.delayed(Duration(milliseconds: 300)).then((_) async {
+        await Provider.of<RecipesProvider>(context).fetchDataToRecipeSearch().then((_) {
+          setState(() {
+            _isLoading = false;
+            availableIngredients =
+                Provider.of<RecipesProvider>(context).allIngredients;
+            availableConfectioneryTypes =
+                Provider.of<RecipesProvider>(context).allConfectioneryTypes;
+            _prepareChosedConfectioneryTypes();
+            _prepareChosedIngredients();
+          });
+        });
+      });*/
+
+      Provider.of<RecipesProvider>(context).fetchDataToRecipeSearch().then((_) {
+        setState(() {
+          _isLoading = false;
+          availableIngredients =
+              Provider.of<RecipesProvider>(context, listen: false)
+                  .allIngredients;
+          availableConfectioneryTypes =
+              Provider.of<RecipesProvider>(context, listen: false)
+                  .allConfectioneryTypes;
+          recipesToDisplay =
+              Provider.of<RecipesProvider>(context, listen: false)
+                  .fetchedRecipes;
+          _prepareChosedConfectioneryTypes();
+          _prepareChosedIngredients();
+        });
+      });
+    }
 
     super.didChangeDependencies();
   }
@@ -54,17 +81,23 @@ class _RecipeSearchState extends State<RecipeSearch> {
         title: Text("Search Recipe"),
       ),
       drawer: AppDrawer(),
-      body: ListView.builder(
-        itemCount: widget.recipeDescriptions.length,
-        itemBuilder: (context, index) {
-          return RecipeListItem(widget.recipeDescriptions[index]);
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _openRecipeFiltering,
-        child: Icon(Icons.filter_alt_rounded),
-        backgroundColor: Theme.of(context).accentColor,
-      ),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemCount: recipesToDisplay.length,
+              itemBuilder: (context, index) {
+                return RecipeListItem(recipesToDisplay[index]);
+              },
+            ),
+      floatingActionButton: _isLoading
+          ? null
+          : FloatingActionButton(
+              onPressed: _openRecipeFiltering,
+              child: Icon(Icons.filter_alt_rounded),
+              backgroundColor: Theme.of(context).accentColor,
+            ),
     );
   }
 

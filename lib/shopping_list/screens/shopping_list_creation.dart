@@ -35,18 +35,6 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
       _isInited = true;
     }
 
-    Provider.of<RecipesProvider>(context).allIngredients.then((value) {
-      setState(() {
-        availableIngredients = value;
-      });
-    });
-
-    Provider.of<RecipesProvider>(context).allUnits.then((value) {
-      setState(() {
-        availableUnits = value;
-      });
-    });
-
     super.didChangeDependencies();
   }
 

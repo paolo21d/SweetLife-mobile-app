@@ -39,21 +39,21 @@ class Recipe {
     this.preparationTime = json['preparationTime'];
     this.auditCD = DateTime.parse(json['auditCD']);
     this.auditCU = json['auditCU'];
-    this.photos = (json['photos'] as List).map((photo) => photo).toList();
+    this.photos = (json['photos'] as List).map((photo) => photo as String).toList();
     this.recipeElements = (json['recipeElements'] as List)
         .map((element) => ElementOfRecipe(
-            element["ingredientName"], element["amount"], element["unitName"]))
+            element["ingredientName"], element["amount"] as double, element["unitName"]))
         .toList();
     this.confectioneryTypes = (json['confectioneryTypes'] as List)
         .map((type) => ConfectioneryType(type['id'], type["name"]))
         .toList();
     this.comments = (json['comments'] as List)
         .map((comment) => RecipeComment(
-            comment['content'], comment['auditCD'], comment['userLogin']))
+            comment['content'], DateTime.parse(comment['auditCD']), comment['userLogin']))
         .toList();
     this.rates = (json['rates'] as List)
         .map((rate) =>
-            RecipeRate(rate['rate'], rate['auditCD'], rate['userLogin']))
+            RecipeRate(rate['rate'], DateTime.parse(rate['auditCD']), rate['userLogin']))
         .toList();
   }
 

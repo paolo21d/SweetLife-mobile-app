@@ -1,11 +1,11 @@
-import 'package:SweetLife/model/recipe_description.dart';
+import 'package:SweetLife/model/recipe.dart';
 import 'package:SweetLife/recipes/screens/recipe_details.dart';
 import 'package:flutter/material.dart';
 
 class RecipeListItem extends StatelessWidget {
-  final RecipeDescription recipeDescription;
+  final Recipe recipe;
 
-  RecipeListItem(this.recipeDescription);
+  RecipeListItem(this.recipe);
 
   @override
   Widget build(BuildContext context) {
@@ -22,21 +22,21 @@ class RecipeListItem extends StatelessWidget {
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(10), topRight: Radius.circular(10)),
               child: Image.network(
-                recipeDescription.photo,
+                recipe.photos.length != 0 ? recipe.photos[0] : "https://inzynieriaprocesow.pl/wp-content/themes/consultix/images/no-image-found-360x250.png",
                 fit: BoxFit.cover,
               ),
             ),
             onTap: () {
               Navigator.of(context).pushNamed(
                 RecipeDetails.routeName,
-                arguments: recipeDescription.id,
+                arguments: recipe.id,
               );
             },
           ),
           Padding(
             padding: EdgeInsets.all(15),
             child: Center(
-              child: Text(recipeDescription.name),
+              child: Text(recipe.name),
             ),
           ),
           Padding(
@@ -47,21 +47,21 @@ class RecipeListItem extends StatelessWidget {
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Text(recipeDescription.rate.toString()),
+                    Text(recipe.rates.length != 0 ? (recipe.rates.map((e) => e.rate).reduce((a, b) => a+b) / recipe.rates.length).toString() : "No rates"),
                     Icon(Icons.favorite),
                   ],
                 ),
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Text(recipeDescription.commentsAmount.toString()),
+                    Text(recipe.comments.length.toString()),
                     Icon(Icons.comment_rounded),
                   ],
                 ),
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Text(recipeDescription.preparationTime.toString()),
+                    Text(recipe.preparationTime.toString()),
                     Icon(Icons.timelapse),
                   ],
                 ),

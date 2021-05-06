@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
@@ -7,9 +8,9 @@ import 'package:SweetLife/model/unit.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class RecipesProvider extends ChangeNotifier {
-  final String authToken;
-  final String userId;
+class RecipesProvider with ChangeNotifier {
+  String _authToken;
+  String _userId;
   final String apiURL =
       "sweetlife-api-default-rtdb.europe-west1.firebasedatabase.app";
 
@@ -18,7 +19,18 @@ class RecipesProvider extends ChangeNotifier {
   List<Unit> _allFetchedUnits;
   List<ConfectioneryType> _allFetchedConfectioneryTypes;
 
-  RecipesProvider(this.authToken, this.userId);
+  // RecipesProvider(this._authToken, this._userId);
+  set authToken(String value) {
+    _authToken = value;
+  }
+
+  set userId(String value) {
+    _userId = value;
+  }
+
+  List<Recipe> get fetchedRecipes {
+    return [..._fetchedRecipes];
+  }
 
   List<Ingredient> get allIngredients {
     return [..._allFetchedIngredients];
@@ -49,6 +61,36 @@ class RecipesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchDataToRecipeSearch() async {
+    await Future.wait([
+      _fetchAllIngredients(),
+      _fetchAllConfectioneryTypes(),
+      _fetchAllRecipes()
+    ]);
+    // await _fetchAllRecipes();
+
+    notifyListeners();
+  }
+
+  Future<void> fetchFilteredRecipes(String searchText, double preparationTime, List<String> ingredients, List<String> confectioneryTypes) async {
+
+  }
+
+  Future<void> _fetchAllRecipes() async {
+    var url = Uri.https(apiURL, "/recipes.json");
+    final response = await http.get(url);
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+
+    List<Recipe> recipes = [];
+    extractedData.forEach((recipeId, rescipeJson) {
+
+      recipes.add(Recipe.fromJson(recipeId, rescipeJson));
+    });
+    _fetchedRecipes = recipes;
+
+    // log(response.body);
+  }
+
   Future<void> _fetchAllIngredients() async {
     var url = Uri.https(apiURL, "/ingredients.json");
     final response = await http.get(url);
@@ -71,7 +113,7 @@ class RecipesProvider extends ChangeNotifier {
     List<Unit> units = [];
     extractedData.forEach((unitId, unitData) {
       units.add(Unit(unitId, unitData['name']));
-      print(units.last);
+      // log(units.last.toString());
     });
     _allFetchedUnits = units;
   }
@@ -84,7 +126,7 @@ class RecipesProvider extends ChangeNotifier {
     List<ConfectioneryType> confectioneryTypes = [];
     extractedData.forEach((typeId, typeData) {
       confectioneryTypes.add(ConfectioneryType(typeId, typeData['name']));
-      print(confectioneryTypes.last);
+      // log(confectioneryTypes.last.toString());
     });
     _allFetchedConfectioneryTypes = confectioneryTypes;
   }

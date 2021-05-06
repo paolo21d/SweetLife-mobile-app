@@ -18,7 +18,7 @@ class RecipeList extends StatelessWidget {
       body: ListView.builder(
         itemCount: recipeDescriptions.length,
         itemBuilder: (context, index) {
-          return RecipeListItem(recipeDescriptions[index]);
+          return RecipeListItem(null);
         },
       ),
     );
