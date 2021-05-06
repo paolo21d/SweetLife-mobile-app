@@ -35,23 +35,6 @@ class _RecipeSearchState extends State<RecipeSearch> {
         _isLoading = true;
       });
       _isInited = true;
-      // _prepareChosedConfectioneryTypes();
-      // _prepareChosedIngredients();
-
-      //fix from https://stackoverflow.com/questions/63805124/unhandled-exception-a-follows-was-used-after-being-disposed-once-you-have-calle
-      /*Future.delayed(Duration(milliseconds: 300)).then((_) async {
-        await Provider.of<RecipesProvider>(context).fetchDataToRecipeSearch().then((_) {
-          setState(() {
-            _isLoading = false;
-            availableIngredients =
-                Provider.of<RecipesProvider>(context).allIngredients;
-            availableConfectioneryTypes =
-                Provider.of<RecipesProvider>(context).allConfectioneryTypes;
-            _prepareChosedConfectioneryTypes();
-            _prepareChosedIngredients();
-          });
-        });
-      });*/
 
       Provider.of<RecipesProvider>(context).fetchDataToRecipeSearch().then((_) {
         setState(() {

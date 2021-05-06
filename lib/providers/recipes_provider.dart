@@ -67,7 +67,6 @@ class RecipesProvider with ChangeNotifier {
       _fetchAllConfectioneryTypes(),
       _fetchAllRecipes()
     ]);
-    // await _fetchAllRecipes();
 
     notifyListeners();
   }

@@ -24,7 +24,6 @@ class _RecipeCreationState extends State<RecipeCreation> {
   final _descriptionFocusNode = FocusNode();
 
   final _form = GlobalKey<FormState>();
-  bool _isInited = false;
   Map<String, bool> checkedConfectioneryTypes = <String, bool>{};
   List<File> addedPhotos = <File>[];
   List<ElementOfRecipe> addedIngredients = [];
@@ -34,39 +33,41 @@ class _RecipeCreationState extends State<RecipeCreation> {
   String choosedIngredientName;
   String choosedUnitName;
 
-  //      MOCKS!!
+  bool _isInited = false;
+  var _isLoading = false;
+
+  // fetched data
   List<ConfectioneryType> availableConfectioneryTypes = [];
   List<Ingredient> availableIngredients = [];
   List<Unit> availableUnits = [];
 
-  String dropdownValue = 'One';
-
   @override
   void didChangeDependencies() {
     if (!_isInited) {
+      setState(() {
+        _isLoading = true;
+      });
       addedPhotos = <File>[];
       addedIngredients = [];
-      _prepareCheckedConfectioneryTypes();
       _isInited = true;
+
+      Provider.of<RecipesProvider>(context)
+          .fetchDataToRecipeCreation()
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+          availableIngredients =
+              Provider.of<RecipesProvider>(context, listen: false)
+                  .allIngredients;
+          availableConfectioneryTypes =
+              Provider.of<RecipesProvider>(context, listen: false)
+                  .allConfectioneryTypes;
+          availableUnits =
+              Provider.of<RecipesProvider>(context, listen: false).allUnits;
+          _prepareCheckedConfectioneryTypes();
+        });
+      });
     }
-
-    Provider.of<RecipesProvider>(context).allIngredients.then((value) {
-      setState(() {
-        availableIngredients = value;
-      });
-    });
-
-    Provider.of<RecipesProvider>(context).allUnits.then((value) {
-      setState(() {
-        availableUnits = value;
-      });
-    });
-
-    Provider.of<RecipesProvider>(context).allConfectioneryTypes.then((value) {
-      setState(() {
-        availableConfectioneryTypes = value;
-      });
-    });
 
     super.didChangeDependencies();
   }
@@ -83,104 +84,109 @@ class _RecipeCreationState extends State<RecipeCreation> {
           ],
         ),
         drawer: AppDrawer(),
-        body: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Form(
-            key: _form,
-            child: ListView(
-              children: [
-                Card(
-                  child: Column(
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Form(
+                  key: _form,
+                  child: ListView(
                     children: [
-                      //name
-                      TextFormField(
-                          initialValue: "",
-                          decoration: InputDecoration(labelText: "Name"),
-                          textInputAction: TextInputAction.next,
-                          onFieldSubmitted: (_) {
-                            FocusScope.of(context)
-                                .requestFocus(_preparationTimeFocusNode);
-                          },
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Please enter recipe name';
-                            }
-                            return null;
-                          }),
+                      Card(
+                        child: Column(
+                          children: [
+                            //name
+                            TextFormField(
+                                initialValue: "",
+                                decoration: InputDecoration(labelText: "Name"),
+                                textInputAction: TextInputAction.next,
+                                onFieldSubmitted: (_) {
+                                  FocusScope.of(context)
+                                      .requestFocus(_preparationTimeFocusNode);
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter recipe name';
+                                  }
+                                  return null;
+                                }),
 
-                      // preparation time
-                      TextFormField(
-                        initialValue: "",
-                        decoration:
-                            InputDecoration(labelText: 'Preparation time'),
-                        textInputAction: TextInputAction.next,
-                        keyboardType: TextInputType.number,
-                        focusNode: _preparationTimeFocusNode,
-                        onFieldSubmitted: (_) {
-                          FocusScope.of(context)
-                              .requestFocus(_descriptionFocusNode);
-                        },
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter a preparation time in minutes.';
-                          }
-                          if (double.tryParse(value) == null) {
-                            return 'Please enter a valid number.';
-                          }
-                          if (double.parse(value) <= 0) {
-                            return 'Please enter a number greater than zero.';
-                          }
-                          return null;
-                        },
-                        onSaved: null,
-                      ),
+                            // preparation time
+                            TextFormField(
+                              initialValue: "",
+                              decoration: InputDecoration(
+                                  labelText: 'Preparation time'),
+                              textInputAction: TextInputAction.next,
+                              keyboardType: TextInputType.number,
+                              focusNode: _preparationTimeFocusNode,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context)
+                                    .requestFocus(_descriptionFocusNode);
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter a preparation time in minutes.';
+                                }
+                                if (double.tryParse(value) == null) {
+                                  return 'Please enter a valid number.';
+                                }
+                                if (double.parse(value) <= 0) {
+                                  return 'Please enter a number greater than zero.';
+                                }
+                                return null;
+                              },
+                              onSaved: null,
+                            ),
 
-                      //description
-                      TextFormField(
-                        initialValue: "",
-                        decoration: InputDecoration(labelText: 'Description'),
-                        maxLines: 5,
-                        keyboardType: TextInputType.multiline,
-                        focusNode: _descriptionFocusNode,
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Please enter a description.';
-                          }
-                          if (value.length < 10) {
-                            return 'Should be at least 10 characters long.';
-                          }
-                          return null;
-                        },
-                        onSaved: null,
-                      ),
-                    ],
-                  ),
-                ),
-
-                // image picker
-                Card(
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Photos:",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 17),
+                            //description
+                            TextFormField(
+                              initialValue: "",
+                              decoration:
+                                  InputDecoration(labelText: 'Description'),
+                              maxLines: 5,
+                              keyboardType: TextInputType.multiline,
+                              focusNode: _descriptionFocusNode,
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter a description.';
+                                }
+                                if (value.length < 10) {
+                                  return 'Should be at least 10 characters long.';
+                                }
+                                return null;
+                              },
+                              onSaved: null,
+                            ),
+                          ],
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          IconButton(
-                              icon: Icon(Icons.photo_library),
-                              onPressed: _imgFromGallery),
-                          IconButton(
-                              icon: Icon(Icons.photo_camera),
-                              onPressed: _imgFromCamera)
-                        ],
-                      ),
-                      /*...addedPhotos.map((photoFile) {
+
+                      // image picker
+                      Card(
+                        child: Column(
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                "Photos:",
+                                textAlign: TextAlign.left,
+                                style: TextStyle(fontSize: 17),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                IconButton(
+                                    icon: Icon(Icons.photo_library),
+                                    onPressed: _imgFromGallery),
+                                IconButton(
+                                    icon: Icon(Icons.photo_camera),
+                                    onPressed: _imgFromCamera)
+                              ],
+                            ),
+                            /*...addedPhotos.map((photoFile) {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: ClipRRect(
@@ -192,107 +198,107 @@ class _RecipeCreationState extends State<RecipeCreation> {
                           ),
                         );
                       })*/
-                      addedPhotos.isEmpty
-                          ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text("No photo"),
-                              ),
-                            )
-                          : Container(
-                              child: CarouselSlider(
-                              options: CarouselOptions(
-                                aspectRatio: 1.0,
-                                enlargeCenterPage: true,
-                                enableInfiniteScroll: false,
-                                pageViewKey:
-                                    PageStorageKey<String>('carousel_slider'),
-                              ),
-                              items: imageSliders(context),
-                            ))
-                    ],
-                  ),
-                ),
-
-                //  ingredients
-                Card(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Ingredients:",
-                              textAlign: TextAlign.left,
-                              style: TextStyle(fontSize: 17),
-                            ),
-                          ),
-                          IconButton(
-                              icon: Icon(Icons.add),
-                              onPressed: () {
-                                _addIngredientFiled(context);
-                              }),
-                        ],
+                            addedPhotos.isEmpty
+                                ? Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text("No photo"),
+                                    ),
+                                  )
+                                : Container(
+                                    child: CarouselSlider(
+                                    options: CarouselOptions(
+                                      aspectRatio: 1.0,
+                                      enlargeCenterPage: true,
+                                      enableInfiniteScroll: false,
+                                      pageViewKey: PageStorageKey<String>(
+                                          'carousel_slider'),
+                                    ),
+                                    items: imageSliders(context),
+                                  ))
+                          ],
+                        ),
                       ),
-                      ...addedIngredients.map((ingredient) {
-                        return ListTile(
-                          title: Text(ingredient.ingredientName),
-                          subtitle:
-                              Text("${ingredient.amount} ${ingredient.unitName}"),
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              setState(() {
-                                addedIngredients.removeWhere(
-                                    (element) => element == ingredient);
-                              });
-                            },
+
+                      //  ingredients
+                      Card(
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    "Ingredients:",
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(fontSize: 17),
+                                  ),
+                                ),
+                                IconButton(
+                                    icon: Icon(Icons.add),
+                                    onPressed: () {
+                                      _addIngredientFiled(context);
+                                    }),
+                              ],
+                            ),
+                            ...addedIngredients.map((ingredient) {
+                              return ListTile(
+                                title: Text(ingredient.ingredientName),
+                                subtitle: Text(
+                                    "${ingredient.amount} ${ingredient.unitName}"),
+                                trailing: IconButton(
+                                  icon: Icon(Icons.delete),
+                                  onPressed: () {
+                                    setState(() {
+                                      addedIngredients.removeWhere(
+                                          (element) => element == ingredient);
+                                    });
+                                  },
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+
+                      //  confectionery types
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: Card(
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "Confectionery types:",
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(fontSize: 17),
+                                ),
+                              ),
+                              ...availableConfectioneryTypes.map(
+                                (confectioneryType) {
+                                  return CheckboxListTile(
+                                    value: checkedConfectioneryTypes[
+                                        confectioneryType.id],
+                                    title: Text(confectioneryType.name),
+                                    onChanged: (bool value) {
+                                      setState(() {
+                                        checkedConfectioneryTypes[
+                                            confectioneryType.id] = value;
+                                      });
+                                    },
+                                    // contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                                  );
+                                },
+                              ),
+                            ],
                           ),
-                        );
-                      }),
+                        ),
+                      )
                     ],
                   ),
                 ),
-
-                //  confectionery types
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Card(
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Confectionery types:",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 17),
-                          ),
-                        ),
-                        ...availableConfectioneryTypes.map(
-                          (confectioneryType) {
-                            return CheckboxListTile(
-                              value: checkedConfectioneryTypes[
-                                  confectioneryType.id],
-                              title: Text(confectioneryType.name),
-                              onChanged: (bool value) {
-                                setState(() {
-                                  checkedConfectioneryTypes[
-                                      confectioneryType.id] = value;
-                                });
-                              },
-                              // contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ));
+              ));
   }
 
   void _prepareCheckedConfectioneryTypes() {
@@ -501,7 +507,8 @@ class _RecipeCreationState extends State<RecipeCreation> {
         Ingredient ingredient = _getIngredientByName(choosedIngredientName);
         Unit unit = _getUnitByName(choosedUnitName);
         double amount = double.parse(_ingredientCreationAmount.value.text);
-        addedIngredients.add(ElementOfRecipe(ingredient.name, amount, unit.name));
+        addedIngredients
+            .add(ElementOfRecipe(ingredient.name, amount, unit.name));
       }
       choosedIngredientName = availableIngredients[0].name;
       choosedUnitName = availableUnits[0].name;
