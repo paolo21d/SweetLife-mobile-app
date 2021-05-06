@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
@@ -18,6 +17,7 @@ class RecipesProvider with ChangeNotifier {
   List<Ingredient> _allFetchedIngredients;
   List<Unit> _allFetchedUnits;
   List<ConfectioneryType> _allFetchedConfectioneryTypes;
+  Recipe _fetchedRecipeById;
 
   // RecipesProvider(this._authToken, this._userId);
   set authToken(String value) {
@@ -38,6 +38,10 @@ class RecipesProvider with ChangeNotifier {
 
   List<Unit> get allUnits {
     return [..._allFetchedUnits];
+  }
+
+  Recipe get fetchedRecipeById {
+    return _fetchedRecipeById;
   }
 
   List<ConfectioneryType> get allConfectioneryTypes {
@@ -71,8 +75,18 @@ class RecipesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchFilteredRecipes(String searchText, double preparationTime, List<String> ingredients, List<String> confectioneryTypes) async {
+  Future<void> fetchRecipeById(String recipeId) async {
+    await _fetchAllRecipes();
 
+    _fetchedRecipeById =
+        _fetchedRecipes.firstWhere((recipe) => recipe.id == recipeId);
+
+    notifyListeners();
+  }
+
+  Future<void> fetchFilteredRecipes(String searchText, double preparationTime,
+      List<String> ingredients, List<String> confectioneryTypes) async {
+    //TODO implement filtering
   }
 
   Future<void> _fetchAllRecipes() async {
@@ -82,11 +96,9 @@ class RecipesProvider with ChangeNotifier {
 
     List<Recipe> recipes = [];
     extractedData.forEach((recipeId, rescipeJson) {
-
       recipes.add(Recipe.fromJson(recipeId, rescipeJson));
     });
     _fetchedRecipes = recipes;
-
     // log(response.body);
   }
 
