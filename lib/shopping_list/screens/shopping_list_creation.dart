@@ -73,8 +73,8 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
             ...ingredients.map((element) {
               return Card(
                 child: ListTile(
-                  title: Text(element.ingredient.name),
-                  subtitle: Text("${element.amount} ${element.unit.name}"),
+                  title: Text(element.ingredient),
+                  subtitle: Text("${element.amount} ${element.unit}"),
                   trailing: IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () {
@@ -187,12 +187,12 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
 
     setState(() {
       if (result) {
-        Ingredient ingredient = _getIngredientByName(choosedIngredientName);
-        Unit unit = _getUnitByName(choosedUnitName);
+        // Ingredient ingredient = _getIngredientByName(choosedIngredientName);
+        // Unit unit = _getUnitByName(choosedUnitName);
         double amount =
             double.parse(_ingredientCreationAmountController.value.text);
         ingredients
-            .add(ShoppingListElement(null, amount, ingredient, unit, true));
+            .add(ShoppingListElement(amount, choosedIngredientName, choosedUnitName, true));
       }
       choosedIngredientName = availableIngredients[0].name;
       choosedUnitName = availableUnits[0].name;

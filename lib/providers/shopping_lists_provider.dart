@@ -11,4 +11,6 @@ class ShoppingListsProvider with ChangeNotifier {
   set userId(String value) {
     _userId = value;
   }
+
+
 }

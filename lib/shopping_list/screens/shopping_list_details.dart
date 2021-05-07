@@ -1,7 +1,5 @@
-import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/shopping_list.dart';
 import 'package:SweetLife/model/shopping_list_element.dart';
-import 'package:SweetLife/model/unit.dart';
 import 'package:flutter/material.dart';
 
 class ShoppingListDetails extends StatefulWidget {
@@ -15,30 +13,17 @@ class ShoppingListDetails extends StatefulWidget {
 
 class _ShoppingListDetailsState extends State<ShoppingListDetails> {
   ShoppingList shoppingList = ShoppingList(
-      1,
+      "1",
       "my first shopping list",
       [
-        ShoppingListElement(
-            1, 5, Ingredient("1", "ing1"), Unit("1", "unit1"), true),
-        ShoppingListElement(
-            2, 12, Ingredient("2", "ing2"), Unit("1", "unit1"), true),
-        ShoppingListElement(
-            3, 2000, Ingredient("3", "ing3"), Unit("2", "unit2"), false),
-        ShoppingListElement(
-            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
-        ShoppingListElement(
-            4, 0.25, Ingredient("4", "ing4"), Unit("1", "unit1"), true),
+        ShoppingListElement(1, "ing1", "unit1", true),
+        ShoppingListElement(1, "ing1", "unit1", true),
+        ShoppingListElement(1, "ing1", "unit1", true),
+        ShoppingListElement(1, "ing1", "unit1", true),
+        ShoppingListElement(1, "ing1", "unit1", true),
       ],
       DateTime(2021),
-      1);
+      "login11");
 
   @override
   Widget build(BuildContext context) {
@@ -82,14 +67,14 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
                       },
                       controlAffinity: ListTileControlAffinity.leading,
                       title: element.active
-                          ? Text(element.ingredient.name)
+                          ? Text(element.ingredient)
                           : Text(
-                              element.ingredient.name,
+                              element.ingredient,
                               style: TextStyle(
                                   decoration: TextDecoration.lineThrough,
                                   color: Colors.grey),
                             ),
-                      subtitle: Text("${element.amount} ${element.unit.name}"),
+                      subtitle: Text("${element.amount} ${element.unit}"),
                       secondary: IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {

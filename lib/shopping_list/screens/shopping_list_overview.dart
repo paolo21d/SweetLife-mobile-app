@@ -1,5 +1,6 @@
 import 'package:SweetLife/app_drawer.dart';
-import 'package:SweetLife/model/shopping_list_description.dart';
+import 'package:SweetLife/model/shopping_list.dart';
+import 'package:SweetLife/model/shopping_list_element.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_creation.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_details.dart';
 import 'package:flutter/material.dart';
@@ -13,14 +14,25 @@ class ShoppingListOverview extends StatefulWidget {
 }
 
 class _ShoppingListOverviewState extends State<ShoppingListOverview> {
-  List<ShoppingListDescription> shoppingLists = [
-    ShoppingListDescription(1, "lista1", DateTime(2021), 5, 3, 1),
-    ShoppingListDescription(2, "lista2", DateTime(2021), 5, 3, 1),
-    ShoppingListDescription(3, "lista3", DateTime(2021), 5, 3, 1),
-    ShoppingListDescription(4, "lista4", DateTime(2021), 5, 3, 1),
-    ShoppingListDescription(4, "lista4", DateTime(2021), 5, 3, 1),
-    ShoppingListDescription(4, "lista4", DateTime(2021), 5, 3, 1),
-    ShoppingListDescription(4, "lista4", DateTime(2021), 5, 3, 1),
+  List<ShoppingList> shoppingLists = [
+    ShoppingList(
+        "id1",
+        "list1",
+        [ShoppingListElement(10, "ing1", "unit1", true)],
+        DateTime(2021),
+        "login1"),
+    ShoppingList(
+        "id1",
+        "list2",
+        [ShoppingListElement(10, "ing1", "unit1", true)],
+        DateTime(2021),
+        "login1"),
+    ShoppingList(
+        "id1",
+        "list3",
+        [ShoppingListElement(10, "ing1", "unit1", true)],
+        DateTime(2021),
+        "login1"),
   ];
 
   @override
@@ -45,7 +57,7 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                        "All elements: ${shoppingLists[index].elementsQuantity}"),
+                        "All elements: ${shoppingLists[index].elements.length}"),
                     Text(
                         "To buy elements: ${shoppingLists[index].activeElementsQuantity}"),
                     SizedBox(
