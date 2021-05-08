@@ -1,4 +1,3 @@
-import 'package:SweetLife/model/recipe_description.dart';
 import 'package:SweetLife/providers/auth_provider.dart';
 import 'package:SweetLife/providers/recipes_provider.dart';
 import 'package:SweetLife/providers/shopping_lists_provider.dart';
