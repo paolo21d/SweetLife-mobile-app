@@ -1,10 +1,11 @@
 import 'package:SweetLife/app_drawer.dart';
 import 'package:SweetLife/model/shopping_list.dart';
-import 'package:SweetLife/model/shopping_list_element.dart';
+import 'package:SweetLife/providers/shopping_lists_provider.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_creation.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ShoppingListOverview extends StatefulWidget {
   static const routeName = '/shopping-list-overview';
@@ -14,8 +15,12 @@ class ShoppingListOverview extends StatefulWidget {
 }
 
 class _ShoppingListOverviewState extends State<ShoppingListOverview> {
+  bool _isInited = false;
+  var _isLoading = false;
+
+  // fetched data
   List<ShoppingList> shoppingLists = [
-    ShoppingList(
+    /*ShoppingList(
         "id1",
         "list1",
         [ShoppingListElement(10, "ing1", "unit1", true)],
@@ -32,8 +37,31 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
         "list3",
         [ShoppingListElement(10, "ing1", "unit1", true)],
         DateTime(2021),
-        "login1"),
+        "login1"),*/
   ];
+
+  @override
+  void didChangeDependencies() {
+    if (!_isInited) {
+      setState(() {
+        _isLoading = true;
+      });
+      _isInited = true;
+
+      Provider.of<ShoppingListsProvider>(context)
+          .fetchDataToShoppingListOverview()
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+          shoppingLists =
+              Provider.of<ShoppingListsProvider>(context, listen: false)
+                  .fetchedShoppingLists;
+        });
+      });
+    }
+
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,46 +70,50 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
         title: Text("Shopping Lists"),
       ),
       drawer: AppDrawer(),
-      body: ListView.builder(
-        itemCount: shoppingLists.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              title: Text(
-                shoppingLists[index].name,
-                style: TextStyle(fontSize: 20),
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        "All elements: ${shoppingLists[index].elements.length}"),
-                    Text(
-                        "To buy elements: ${shoppingLists[index].activeElementsQuantity}"),
-                    SizedBox(
-                      height: 5,
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemCount: shoppingLists.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: ListTile(
+                    title: Text(
+                      shoppingLists[index].name,
+                      style: TextStyle(fontSize: 20),
                     ),
-                    Text(
-                        "Created: ${DateFormat.yMMMd().format(shoppingLists[index].auditCD)}")
-                  ],
-                ),
-              ),
-              trailing: TextButton(
-                child: Text("Details"),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    ShoppingListDetails.routeName,
-                    arguments: shoppingLists[index].id,
-                  );
-                },
-              ),
-            ),
-            elevation: 10,
-          );
+                    subtitle: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              "All elements: ${shoppingLists[index].elements.length}"),
+                          Text(
+                              "To buy elements: ${shoppingLists[index].activeElementsQuantity}"),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                              "Created: ${DateFormat.yMMMd().format(shoppingLists[index].auditCD)}")
+                        ],
+                      ),
+                    ),
+                    trailing: TextButton(
+                      child: Text("Details"),
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(
+                          ShoppingListDetails.routeName,
+                          arguments: shoppingLists[index].id,
+                        );
+                      },
+                    ),
+                  ),
+                  elevation: 10,
+                );
 
-          /*return Card(
+                /*return Card(
             child: Row(
               children: [
                 Text(
@@ -104,8 +136,8 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
             ),
             elevation: 10,
           );*/
-        },
-      ),
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           //TODO redirect to ShoppingListCreation screen
