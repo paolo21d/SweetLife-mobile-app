@@ -76,6 +76,13 @@ class ShoppingListsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteShoppingList(String shoppingListId) async {
+    var url = Uri.https(apiURL, "/shopping-lists/$shoppingListId.json");
+    await http.delete(url);
+
+    notifyListeners();
+  }
+
   // private methods
   Future<void> _fetchAllShoppingLists() async {
     // TODO fetch shopping list only for logged user

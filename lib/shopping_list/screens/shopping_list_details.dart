@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:SweetLife/model/shopping_list.dart';
 import 'package:SweetLife/providers/shopping_lists_provider.dart';
 import 'package:flutter/material.dart';
@@ -13,18 +15,6 @@ class ShoppingListDetails extends StatefulWidget {
 }
 
 class _ShoppingListDetailsState extends State<ShoppingListDetails> {
-  /*ShoppingList shoppingList = ShoppingList(
-      "1",
-      "my first shopping list",
-      [
-        ShoppingListElement(1, "ing1", "unit1", true),
-        ShoppingListElement(1, "ing1", "unit1", true),
-        ShoppingListElement(1, "ing1", "unit1", true),
-        ShoppingListElement(1, "ing1", "unit1", true),
-        ShoppingListElement(1, "ing1", "unit1", true),
-      ],
-      DateTime(2021),
-      "login11");*/
   bool _isInited = false;
   var _isLoading = false;
 
@@ -71,6 +61,36 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
               icon: Icon(Icons.delete),
               onPressed: () {
                 // TODO Delete this shopping list and redirect back to ShoppingListOverview
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text('Shopping List Delete'),
+                    content: Text(
+                        'Are you sure you want to delete the shopping list?'),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('Delete'),
+                        onPressed: () {
+                          Navigator.of(ctx).pop(true);
+                        },
+                      ),
+                      FlatButton(
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(ctx).pop(false);
+                        },
+                      )
+                    ],
+                  ),
+                ).then((value) {
+                  if (value) {
+                    _deleteShoppingList().then((deleted) {
+                      if (deleted) {
+                        Navigator.of(context).pop();
+                      }
+                    });
+                  }
+                });
               })
         ],
       ),
@@ -125,5 +145,24 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
               ),
             ),
     );
+  }
+
+  Future<bool> _deleteShoppingList() async {
+    try {
+      await Provider.of<ShoppingListsProvider>(context, listen: false)
+          .deleteShoppingList(shoppingList.id);
+      return true;
+    } catch (error) {
+      log(error.toString());
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Deleting failed!',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+      return false;
+    }
   }
 }
