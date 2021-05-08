@@ -24,6 +24,7 @@ class ShoppingListsProvider with ChangeNotifier {
   List<Ingredient> _allFetchedIngredients;
   List<Unit> _allFetchedUnits;
   ShoppingList _fetchedShoppingListById;
+  String _createdShoppingListId;
 
   List<ShoppingList> get fetchedShoppingLists {
     return _fetchedShoppingLists;
@@ -39,6 +40,10 @@ class ShoppingListsProvider with ChangeNotifier {
 
   ShoppingList get fetchedShoppingListById {
     return _fetchedShoppingListById;
+  }
+
+  String get createdShoppingListId {
+    return _createdShoppingListId;
   }
 
   Future<void> fetchDataToShoppingListCreation() async {
@@ -59,6 +64,15 @@ class ShoppingListsProvider with ChangeNotifier {
   Future<void> fetchDataToShoppingListOverview() async {
     await _fetchAllShoppingLists();
 
+    notifyListeners();
+  }
+
+  Future<void> createShoppingList(ShoppingList shoppingList) async {
+    var url = Uri.https(apiURL, "/shopping-lists.json");
+    final response = await http.post(url, body: shoppingList.toJson());
+
+    _createdShoppingListId =
+        (json.decode(response.body) as Map<String, dynamic>)["name"];
     notifyListeners();
   }
 

@@ -577,7 +577,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
           creatingDescription,
           creatingPreparationTime,
           DateTime.now(),
-          "loginX",
+          "loginX", // TODO assign logged user ID
           List<String>.empty(),
           //TODO assign creatingPhotosInBase64
           addedIngredients,

@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:SweetLife/model/ingredient.dart';
+import 'package:SweetLife/model/shopping_list.dart';
 import 'package:SweetLife/model/shopping_list_element.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:SweetLife/providers/shopping_lists_provider.dart';
@@ -16,15 +19,19 @@ class ShoppingListCreation extends StatefulWidget {
 
 class _ShoppingListCreationState extends State<ShoppingListCreation> {
   TextEditingController _shoppingListNameController = TextEditingController();
-  List<ShoppingListElement> ingredients;
-
   TextEditingController _ingredientCreationAmountController =
       TextEditingController();
+
   String choosedIngredientName;
   String choosedUnitName;
-
   bool _isInited = false;
   var _isLoading = false;
+
+  bool isValidName = true;
+  bool isValidIngredients = true;
+
+  // crating ShoppingListData
+  List<ShoppingListElement> ingredients;
 
   // fetched data
   List<Ingredient> availableIngredients = [];
@@ -64,10 +71,9 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
         title: Text("Shopping List Creation"),
         actions: [
           IconButton(
-              icon: Icon(Icons.save),
-              onPressed: () {
-                //TODO implement saving
-              }),
+            icon: Icon(Icons.save),
+            onPressed: _saveShoppingList,
+          ),
         ],
       ),
       body: _isLoading
@@ -87,12 +93,35 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
                           style: TextStyle(fontSize: 18),
                         ),
                         TextField(
-                            controller: _shoppingListNameController,
-                            decoration: InputDecoration(
-                                hintText: "Shopping List Name")),
+                          controller: _shoppingListNameController,
+                          decoration: isValidName
+                              ? InputDecoration(hintText: "Shopping List Name")
+                              : InputDecoration(
+                                  hintText: "Shopping List Name",
+                                  errorText: "Invalid name"),
+                        ),
                       ],
                     ),
                   ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      "Ingredients",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  !isValidIngredients
+                      ? Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            "Invalid ingredients",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFFD32F2F),
+                            ),
+                          ),
+                        )
+                      : Center(),
                   ...ingredients.map((element) {
                     return Card(
                       child: ListTile(
@@ -223,5 +252,54 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
       choosedUnitName = availableUnits[0].name;
       _ingredientCreationAmountController.clear();
     });
+  }
+
+  Future<void> _saveShoppingList() async {
+    bool isValid = _validateForm();
+
+    if (isValid) {
+      String creatingListName = _shoppingListNameController.value.text;
+
+      ShoppingList creatingShoppingList = ShoppingList(null, creatingListName,
+          ingredients, DateTime.now(), "loginX" //TODO assign logged user ID
+          );
+
+      try {
+        await Provider.of<ShoppingListsProvider>(context, listen: false)
+            .createShoppingList(creatingShoppingList)
+            .then((_) {
+          String createdShoppingListId =
+              Provider.of<ShoppingListsProvider>(context, listen: false).createdShoppingListId;
+
+          // TODO redirect to created ShoppingListDetails
+          log(createdShoppingListId);
+        });
+      } catch (error) {
+        log(error.toString());
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('An error occurred!'),
+            content: Text('Something went wrong.'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+              )
+            ],
+          ),
+        );
+      }
+    }
+  }
+
+  bool _validateForm() {
+    setState(() {
+      isValidName = _shoppingListNameController.value.text.isNotEmpty;
+      isValidIngredients = ingredients.isNotEmpty;
+    });
+    return isValidName && isValidIngredients;
   }
 }
