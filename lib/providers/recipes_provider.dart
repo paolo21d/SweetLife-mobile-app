@@ -18,6 +18,7 @@ class RecipesProvider with ChangeNotifier {
   List<Unit> _allFetchedUnits;
   List<ConfectioneryType> _allFetchedConfectioneryTypes;
   Recipe _fetchedRecipeById;
+  String _createdRecipeId;
 
   // RecipesProvider(this._authToken, this._userId);
   set authToken(String value) {
@@ -48,11 +49,16 @@ class RecipesProvider with ChangeNotifier {
     return [..._allFetchedConfectioneryTypes];
   }
 
-  Future<String> createRecipe(Recipe recipe) async {
+  String get createdRecipeId {
+    return _createdRecipeId;
+  }
+
+  Future<void> createRecipe(Recipe recipe) async {
     var url = Uri.https(apiURL, "/recipes.json");
     final response = await http.post(url, body: recipe.toJson());
 
-    return (response.body as Map<String, dynamic>)["name"];
+    _createdRecipeId = (json.decode(response.body) as Map<String, dynamic>)["name"];
+    notifyListeners();
   }
 
   Future<void> fetchDataToRecipeCreation() async {

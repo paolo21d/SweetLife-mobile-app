@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/element_of_recipe.dart';
 import 'package:SweetLife/model/ingredient.dart';
+import 'package:SweetLife/model/recipe.dart';
+import 'package:SweetLife/model/recipe_comment.dart';
+import 'package:SweetLife/model/recipe_rate.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:SweetLife/providers/recipes_provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -24,14 +29,22 @@ class _RecipeCreationState extends State<RecipeCreation> {
   final _descriptionFocusNode = FocusNode();
 
   final _form = GlobalKey<FormState>();
-  Map<String, bool> checkedConfectioneryTypes = <String, bool>{};
-  List<File> addedPhotos = <File>[];
-  List<ElementOfRecipe> addedIngredients = [];
 
+  bool isValidIngredients = true;
+  bool isValidConfectioneryType = true;
+
+  // ingredient creation data
   TextEditingController _ingredientCreationAmount = TextEditingController();
-
   String choosedIngredientName;
   String choosedUnitName;
+
+  //creating Recipe data
+  String creatingName;
+  int creatingPreparationTime;
+  String creatingDescription;
+  List<File> addedPhotos = <File>[];
+  Map<String, bool> checkedConfectioneryTypes = <String, bool>{};
+  List<ElementOfRecipe> addedIngredients = [];
 
   bool _isInited = false;
   var _isLoading = false;
@@ -79,8 +92,10 @@ class _RecipeCreationState extends State<RecipeCreation> {
         appBar: AppBar(
           title: Text("Recipe Creation"),
           actions: [
-            IconButton(icon: Icon(Icons.save), onPressed: null),
-            //TODO implement saving
+            IconButton(
+              icon: Icon(Icons.save),
+              onPressed: _saveRecipe,
+            ),
           ],
         ),
         drawer: AppDrawer(),
@@ -99,19 +114,21 @@ class _RecipeCreationState extends State<RecipeCreation> {
                           children: [
                             //name
                             TextFormField(
-                                initialValue: "",
-                                decoration: InputDecoration(labelText: "Name"),
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) {
-                                  FocusScope.of(context)
-                                      .requestFocus(_preparationTimeFocusNode);
-                                },
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Please enter recipe name';
-                                  }
-                                  return null;
-                                }),
+                              initialValue: "",
+                              decoration: InputDecoration(labelText: "Name"),
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context)
+                                    .requestFocus(_preparationTimeFocusNode);
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter recipe name';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) => creatingName = value,
+                            ),
 
                             // preparation time
                             TextFormField(
@@ -129,15 +146,16 @@ class _RecipeCreationState extends State<RecipeCreation> {
                                 if (value.isEmpty) {
                                   return 'Please enter a preparation time in minutes.';
                                 }
-                                if (double.tryParse(value) == null) {
+                                if (int.tryParse(value) == null) {
                                   return 'Please enter a valid number.';
                                 }
-                                if (double.parse(value) <= 0) {
+                                if (int.parse(value) <= 0) {
                                   return 'Please enter a number greater than zero.';
                                 }
                                 return null;
                               },
-                              onSaved: null,
+                              onSaved: (value) =>
+                                  creatingPreparationTime = int.parse(value),
                             ),
 
                             //description
@@ -157,7 +175,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
                                 }
                                 return null;
                               },
-                              onSaved: null,
+                              onSaved: (value) => creatingDescription = value,
                             ),
                           ],
                         ),
@@ -186,18 +204,6 @@ class _RecipeCreationState extends State<RecipeCreation> {
                                     onPressed: _imgFromCamera)
                               ],
                             ),
-                            /*...addedPhotos.map((photoFile) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            child: Image.file(
-                              photoFile,
-                              fit: BoxFit.fitHeight,
-                            ),
-                          ),
-                        );
-                      })*/
                             addedPhotos.isEmpty
                                 ? Center(
                                     child: Padding(
@@ -241,6 +247,18 @@ class _RecipeCreationState extends State<RecipeCreation> {
                                     }),
                               ],
                             ),
+                            !isValidIngredients
+                                ? Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "Invalid ingredients",
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFFD32F2F)),
+                                    ),
+                                  )
+                                : Center(),
                             ...addedIngredients.map((ingredient) {
                               return ListTile(
                                 title: Text(ingredient.ingredientName),
@@ -275,6 +293,18 @@ class _RecipeCreationState extends State<RecipeCreation> {
                                   style: TextStyle(fontSize: 17),
                                 ),
                               ),
+                              !isValidConfectioneryType
+                                  ? Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        "Invalid confectionery types",
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color(0xFFD32F2F)),
+                                      ),
+                                    )
+                                  : Center(),
                               ...availableConfectioneryTypes.map(
                                 (confectioneryType) {
                                   return CheckboxListTile(
@@ -514,5 +544,85 @@ class _RecipeCreationState extends State<RecipeCreation> {
       choosedUnitName = availableUnits[0].name;
       _ingredientCreationAmount.clear();
     });
+  }
+
+  Future<void> _saveRecipe() async {
+    bool isValid = validateForm();
+    //  TODO validate form
+    if (isValid) {
+      _form.currentState.save();
+      /*setState(() {
+        _isLoading = true;
+      });*/
+
+      List<ConfectioneryType> creatingConfectioneryTypes = [];
+      checkedConfectioneryTypes.forEach((typeId, typeValue) {
+        if (typeValue) {
+          creatingConfectioneryTypes.add(availableConfectioneryTypes
+              .firstWhere((element) => element.id == typeId));
+        }
+      });
+
+      List<String> creatingPhotosInBase64 = [];
+      addedPhotos.forEach((imageFile) {
+        List<int> bytes = imageFile.readAsBytesSync();
+        String photoInBase64 = base64Encode(bytes);
+        creatingPhotosInBase64.add(photoInBase64);
+        // log(photoInBase64);
+      });
+
+      Recipe creatingRecipe = Recipe(
+          null,
+          creatingName,
+          creatingDescription,
+          creatingPreparationTime,
+          DateTime.now(),
+          "loginX",
+          List<String>.empty(),
+          //TODO assign creatingPhotosInBase64
+          addedIngredients,
+          creatingConfectioneryTypes,
+          List<RecipeComment>.empty(),
+          List<RecipeRate>.empty());
+      // log(creatingRecipe.toJson());
+
+      try {
+        await Provider.of<RecipesProvider>(context, listen: false)
+            .createRecipe(creatingRecipe)
+            .then((value) => log(
+                Provider.of<RecipesProvider>(context, listen: false)
+                    .createdRecipeId));
+      //  redirect to created recipe to RecipeDetailsScreen
+      } catch (error) {
+        log(error.toString());
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('An error occurred!'),
+            content: Text('Something went wrong.'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Okay'),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+              )
+            ],
+          ),
+        );
+      }
+    }
+  }
+
+  bool validateForm() {
+    bool isValidNameTimeDescription = _form.currentState.validate();
+    setState(() {
+      isValidIngredients = addedIngredients.isNotEmpty;
+      isValidConfectioneryType = checkedConfectioneryTypes.containsValue(true);
+    });
+
+    return isValidNameTimeDescription &&
+        isValidIngredients &&
+        isValidConfectioneryType;
   }
 }
