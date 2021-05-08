@@ -1,7 +1,7 @@
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/shopping_list_element.dart';
 import 'package:SweetLife/model/unit.dart';
-import 'package:SweetLife/providers/recipes_provider.dart';
+import 'package:SweetLife/providers/shopping_lists_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +15,6 @@ class ShoppingListCreation extends StatefulWidget {
 }
 
 class _ShoppingListCreationState extends State<ShoppingListCreation> {
-  bool _isInited = false;
   TextEditingController _shoppingListNameController = TextEditingController();
   List<ShoppingListElement> ingredients;
 
@@ -24,15 +23,35 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
   String choosedIngredientName;
   String choosedUnitName;
 
-  //      MOCKS!!
+  bool _isInited = false;
+  var _isLoading = false;
+
+  // fetched data
   List<Ingredient> availableIngredients = [];
   List<Unit> availableUnits = [];
 
   @override
   void didChangeDependencies() {
     if (!_isInited) {
+      setState(() {
+        _isLoading = true;
+      });
       ingredients = <ShoppingListElement>[];
       _isInited = true;
+
+      Provider.of<ShoppingListsProvider>(context)
+          .fetchDataToShoppingListCreation()
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+          availableIngredients =
+              Provider.of<ShoppingListsProvider>(context, listen: false)
+                  .allIngredients;
+          availableUnits =
+              Provider.of<ShoppingListsProvider>(context, listen: false)
+                  .allUnits;
+        });
+      });
     }
 
     super.didChangeDependencies();
@@ -51,49 +70,55 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
               }),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Name",
-                    style: TextStyle(fontSize: 18),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Wrap(
+                      children: [
+                        Text(
+                          "Name",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        TextField(
+                            controller: _shoppingListNameController,
+                            decoration: InputDecoration(
+                                hintText: "Shopping List Name")),
+                      ],
+                    ),
                   ),
-                  TextField(
-                      controller: _shoppingListNameController,
-                      decoration:
-                          InputDecoration(hintText: "Shopping List Name")),
+                  ...ingredients.map((element) {
+                    return Card(
+                      child: ListTile(
+                        title: Text(element.ingredient),
+                        subtitle: Text("${element.amount} ${element.unit}"),
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            setState(() {
+                              ingredients.remove(element);
+                            });
+                          },
+                        ),
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
-            ...ingredients.map((element) {
-              return Card(
-                child: ListTile(
-                  title: Text(element.ingredient),
-                  subtitle: Text("${element.amount} ${element.unit}"),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      setState(() {
-                        ingredients.remove(element);
-                      });
-                    },
-                  ),
-                ),
-              );
-            }),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _addIngredient(context),
-        child: Icon(Icons.add),
-        backgroundColor: Theme.of(context).accentColor,
-      ),
+      floatingActionButton: _isLoading
+          ? null
+          : FloatingActionButton(
+              onPressed: () => _addIngredient(context),
+              child: Icon(Icons.add),
+              backgroundColor: Theme.of(context).accentColor,
+            ),
     );
   }
 
@@ -191,8 +216,8 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
         // Unit unit = _getUnitByName(choosedUnitName);
         double amount =
             double.parse(_ingredientCreationAmountController.value.text);
-        ingredients
-            .add(ShoppingListElement(amount, choosedIngredientName, choosedUnitName, true));
+        ingredients.add(ShoppingListElement(
+            amount, choosedIngredientName, choosedUnitName, true));
       }
       choosedIngredientName = availableIngredients[0].name;
       choosedUnitName = availableUnits[0].name;
