@@ -5,6 +5,7 @@ import 'package:SweetLife/model/shopping_list.dart';
 import 'package:SweetLife/model/shopping_list_element.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:SweetLife/providers/shopping_lists_provider.dart';
+import 'package:SweetLife/shopping_list/screens/shopping_list_details.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -269,10 +270,13 @@ class _ShoppingListCreationState extends State<ShoppingListCreation> {
             .createShoppingList(creatingShoppingList)
             .then((_) {
           String createdShoppingListId =
-              Provider.of<ShoppingListsProvider>(context, listen: false).createdShoppingListId;
+              Provider.of<ShoppingListsProvider>(context, listen: false)
+                  .createdShoppingListId;
 
-          // TODO redirect to created ShoppingListDetails
-          log(createdShoppingListId);
+          Navigator.of(context).popAndPushNamed(
+            ShoppingListDetails.routeName,
+            arguments: createdShoppingListId,
+          );
         });
       } catch (error) {
         log(error.toString());
