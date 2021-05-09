@@ -52,6 +52,16 @@ class ShoppingListsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchDataToShoppingListModification(
+      String shoppingListId) async {
+    await Future.wait(
+        [_fetchAllIngredients(), _fetchAllUnits(), _fetchAllShoppingLists()]);
+
+    _fetchedShoppingListById = _fetchedShoppingLists
+        .firstWhere((element) => element.id == shoppingListId);
+    notifyListeners();
+  }
+
   Future<void> fetchShoppingListById(String shoppingListId) async {
     await _fetchAllShoppingLists();
 

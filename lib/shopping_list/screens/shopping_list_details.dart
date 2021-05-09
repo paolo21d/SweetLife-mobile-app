@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:SweetLife/model/shopping_list.dart';
 import 'package:SweetLife/model/shopping_list_element.dart';
 import 'package:SweetLife/providers/shopping_lists_provider.dart';
+import 'package:SweetLife/shopping_list/screens/shopping_list_modification.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -57,6 +58,9 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
               icon: Icon(Icons.edit),
               onPressed: () {
                 // TODO redirect to shopping list modification
+                Navigator.of(context).pushNamed(
+                    ShoppingListModification.routeName,
+                    arguments: shoppingList.id);
               }),
           IconButton(
               icon: Icon(Icons.delete),
