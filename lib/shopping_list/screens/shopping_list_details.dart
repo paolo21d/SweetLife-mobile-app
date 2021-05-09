@@ -25,6 +25,8 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
 
   @override
   void didChangeDependencies() {
+    log("ShoppingListDetails didChangeDependencies");
+
     if (!_isInited) {
       setState(() {
         _isLoading = true;
@@ -58,9 +60,16 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
               icon: Icon(Icons.edit),
               onPressed: () {
                 // TODO redirect to shopping list modification
-                Navigator.of(context).pushNamed(
-                    ShoppingListModification.routeName,
-                    arguments: shoppingList.id);
+                Navigator.of(context)
+                    .pushNamed(ShoppingListModification.routeName,
+                        arguments: shoppingList.id)
+                    .then((_) {
+                  setState(() {
+                    _isInited = false;
+                    _isLoading = false;
+                    log("Then in ShoppingListDetails after navigation to ShoppingListModfification");
+                  });
+                });
               }),
           IconButton(
               icon: Icon(Icons.delete),
@@ -137,7 +146,7 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
                                 ),
                           subtitle: Text("${element.amount} ${element.unit}"),
                           secondary: IconButton(
-                            icon: Icon(Icons.delete),
+                            icon: Icon(Icons.clear),
                             onPressed: () {
                               _ingredientDeleteProcedure(element);
                               //  TODO remove this element

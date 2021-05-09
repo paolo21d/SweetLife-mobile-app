@@ -24,6 +24,7 @@ class RecipeDetails extends StatelessWidget {
               icon: Icon(Icons.edit),
               onPressed: () {
                 // TODO redirect to recipe modification
+                // TODO solve this as solved in ShoppingListDetails -> convert to statefull and refresh
                 Navigator.of(context).pushNamed(RecipeModification.routeName,
                     arguments: recipeId);
               }),
