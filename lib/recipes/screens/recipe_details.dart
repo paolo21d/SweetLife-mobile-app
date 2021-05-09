@@ -1,11 +1,8 @@
+import 'dart:convert';
 import 'dart:developer';
 
-import 'package:SweetLife/model/confectionery_type.dart';
-import 'package:SweetLife/model/element_of_recipe.dart';
-import 'package:SweetLife/model/recipe.dart';
-import 'package:SweetLife/model/recipe_comment.dart';
-import 'package:SweetLife/model/recipe_rate.dart';
 import 'package:SweetLife/providers/recipes_provider.dart';
+import 'package:SweetLife/recipes/screens/recipe_modification.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +19,15 @@ class RecipeDetails extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Recipe Details"),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                // TODO redirect to recipe modification
+                Navigator.of(context).pushNamed(RecipeModification.routeName,
+                    arguments: recipeId);
+              }),
+        ],
       ),
       // drawer: AppDrawer(),
       body: FutureBuilder(
@@ -49,7 +55,8 @@ class RecipeDetails extends StatelessWidget {
                             pageViewKey:
                                 PageStorageKey<String>('carousel_slider'),
                           ),
-                          items: imageSliders(recipeData.fetchedRecipeById.photos),
+                          items:
+                              imageSliders(recipeData.fetchedRecipeById.photos),
                         ),
                       ),
                       SizedBox(
@@ -76,7 +83,9 @@ class RecipeDetails extends StatelessWidget {
                             Wrap(
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
-                                Text(recipeData.fetchedRecipeById.comments.length.toString()),
+                                Text(recipeData
+                                    .fetchedRecipeById.comments.length
+                                    .toString()),
                                 Text(" "),
                                 Icon(Icons.comment_rounded),
                               ],
@@ -84,13 +93,16 @@ class RecipeDetails extends StatelessWidget {
                             Wrap(
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
-                                Text(recipeData.fetchedRecipeById.rates.length != 0
-                                    ? (recipeData.fetchedRecipeById.rates
-                                                .map((e) => e.rate)
-                                                .reduce((a, b) => a + b) /
-                                    recipeData.fetchedRecipeById.rates.length)
-                                        .toString()
-                                    : "No rates"),
+                                Text(
+                                    recipeData.fetchedRecipeById.rates.length !=
+                                            0
+                                        ? (recipeData.fetchedRecipeById.rates
+                                                    .map((e) => e.rate)
+                                                    .reduce((a, b) => a + b) /
+                                                recipeData.fetchedRecipeById
+                                                    .rates.length)
+                                            .toString()
+                                        : "No rates"),
                                 Text(" "),
                                 Icon(Icons.favorite),
                               ],
@@ -104,8 +116,8 @@ class RecipeDetails extends StatelessWidget {
                         child: ListTile(
                           leading: Icon(Icons.access_time_rounded),
                           title: Text("Preparation time"),
-                          subtitle:
-                              Text("${recipeData.fetchedRecipeById.preparationTime.toString()} min"),
+                          subtitle: Text(
+                              "${recipeData.fetchedRecipeById.preparationTime.toString()} min"),
                         ),
                       ),
 
@@ -116,7 +128,8 @@ class RecipeDetails extends StatelessWidget {
                           title: Text("Ingredients"),
                           subtitle: Column(
                             children: [
-                              ...recipeData.fetchedRecipeById.recipeElements.map((element) {
+                              ...recipeData.fetchedRecipeById.recipeElements
+                                  .map((element) {
                                 return Row(
                                   children: [
                                     Padding(
@@ -163,7 +176,9 @@ class RecipeDetails extends StatelessWidget {
                             title: Text(
                               "Directions",
                             ),
-                            subtitle: Text(recipeData.fetchedRecipeById.description, softWrap: true)),
+                            subtitle: Text(
+                                recipeData.fetchedRecipeById.description,
+                                softWrap: true)),
                       ),
 
                       /* Comments */
@@ -173,7 +188,8 @@ class RecipeDetails extends StatelessWidget {
                           title: Text("Comments"),
                           subtitle: Column(
                             children: [
-                              ...recipeData.fetchedRecipeById.comments.map((comment) {
+                              ...recipeData.fetchedRecipeById.comments
+                                  .map((comment) {
                                 return Column(
                                   children: [
                                     ListTile(
@@ -206,9 +222,12 @@ class RecipeDetails extends StatelessWidget {
         .map((photo) => Container(
               margin: EdgeInsets.all(5.0),
               child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  child:
-                      Image.network(photo, fit: BoxFit.cover, width: 1000.0)),
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                child:
+                    // Image.network(photo, fit: BoxFit.cover, width: 1000.0),
+                    Image.memory(base64Decode(photo),
+                        fit: BoxFit.cover, width: 1000.0),
+              ),
             ))
         .toList();
   }

@@ -6,11 +6,10 @@ import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/element_of_recipe.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/recipe.dart';
-import 'package:SweetLife/model/recipe_comment.dart';
-import 'package:SweetLife/model/recipe_rate.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:SweetLife/providers/recipes_provider.dart';
 import 'package:SweetLife/recipes/screens/recipe_details.dart';
+import 'package:SweetLife/recipes/screens/recipe_search.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,14 +17,14 @@ import 'package:provider/provider.dart';
 
 import '../../app_drawer.dart';
 
-class RecipeCreation extends StatefulWidget {
-  static const routeName = '/recipe-creation';
+class RecipeModification extends StatefulWidget {
+  static const routeName = '/recipe-modification';
 
   @override
-  _RecipeCreationState createState() => _RecipeCreationState();
+  _RecipeModificationState createState() => _RecipeModificationState();
 }
 
-class _RecipeCreationState extends State<RecipeCreation> {
+class _RecipeModificationState extends State<RecipeModification> {
   final _preparationTimeFocusNode = FocusNode();
   final _descriptionFocusNode = FocusNode();
 
@@ -49,11 +48,15 @@ class _RecipeCreationState extends State<RecipeCreation> {
 
   bool _isInited = false;
   var _isLoading = false;
+  String _initRecipeNameValue = "";
+  String _initRecipeDescriptionValue = "";
+  String _initRecipePreparationTimeValue = "";
 
   // fetched data
   List<ConfectioneryType> availableConfectioneryTypes = [];
   List<Ingredient> availableIngredients = [];
   List<Unit> availableUnits = [];
+  Recipe modifyingRecipe;
 
   @override
   void didChangeDependencies() {
@@ -61,12 +64,13 @@ class _RecipeCreationState extends State<RecipeCreation> {
       setState(() {
         _isLoading = true;
       });
-      addedPhotos = <String>[];
-      addedIngredients = [];
       _isInited = true;
 
+      String modifyingRecipeId =
+          ModalRoute.of(context).settings.arguments as String;
+
       Provider.of<RecipesProvider>(context)
-          .fetchDataToRecipeCreation()
+          .fetchDataToRecipeModification(modifyingRecipeId)
           .then((_) {
         setState(() {
           _isLoading = false;
@@ -78,7 +82,19 @@ class _RecipeCreationState extends State<RecipeCreation> {
                   .allConfectioneryTypes;
           availableUnits =
               Provider.of<RecipesProvider>(context, listen: false).allUnits;
-          _prepareCheckedConfectioneryTypes();
+
+          //set previous recipe values
+          modifyingRecipe = Provider.of<RecipesProvider>(context, listen: false)
+              .fetchedRecipeById;
+          addedIngredients = modifyingRecipe.recipeElements;
+          addedPhotos = modifyingRecipe.photos;
+          //TODO set name, description, preparation time
+          _initRecipeNameValue = modifyingRecipe.name;
+          _initRecipeDescriptionValue = modifyingRecipe.description;
+          _initRecipePreparationTimeValue =
+              modifyingRecipe.preparationTime.toString();
+
+          _prepareCheckedConfectioneryTypes(modifyingRecipe.confectioneryTypes);
         });
       });
     }
@@ -91,7 +107,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Recipe Creation"),
+          title: Text("Recipe Modification"),
           actions: [
             IconButton(
               icon: Icon(Icons.save),
@@ -115,7 +131,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
                           children: [
                             //name
                             TextFormField(
-                              initialValue: "",
+                              initialValue: _initRecipeNameValue,
                               decoration: InputDecoration(labelText: "Name"),
                               textInputAction: TextInputAction.next,
                               onFieldSubmitted: (_) {
@@ -133,7 +149,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
 
                             // preparation time
                             TextFormField(
-                              initialValue: "",
+                              initialValue: _initRecipePreparationTimeValue,
                               decoration: InputDecoration(
                                   labelText: 'Preparation time'),
                               textInputAction: TextInputAction.next,
@@ -161,7 +177,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
 
                             //description
                             TextFormField(
-                              initialValue: "",
+                              initialValue: _initRecipeDescriptionValue,
                               decoration:
                                   InputDecoration(labelText: 'Description'),
                               maxLines: 5,
@@ -332,10 +348,19 @@ class _RecipeCreationState extends State<RecipeCreation> {
               ));
   }
 
-  void _prepareCheckedConfectioneryTypes() {
+  void _prepareCheckedConfectioneryTypes(
+      List<ConfectioneryType> modifyingRecipeConfectioneryTypes) {
     checkedConfectioneryTypes = <String, bool>{};
     for (ConfectioneryType type in availableConfectioneryTypes) {
-      checkedConfectioneryTypes.putIfAbsent(type.id, () => false);
+      checkedConfectioneryTypes.putIfAbsent(type.id, () {
+        if (modifyingRecipeConfectioneryTypes
+            .where((element) => element.id == type.id)
+            .isNotEmpty) {
+          return true;
+        }
+        return false;
+        // return modifyingRecipeConfectioneryTypes.contains(type);
+      });
       // checkedConfectioneryTypes[type.id] = false;
     }
   }
@@ -343,7 +368,6 @@ class _RecipeCreationState extends State<RecipeCreation> {
   _imgFromCamera() async {
     File image = await ImagePicker.pickImage(
         source: ImageSource.camera, imageQuality: 100);
-
     String imageInBase64 = base64Encode(image.readAsBytesSync());
     setState(() {
       if (image != null) {
@@ -355,7 +379,6 @@ class _RecipeCreationState extends State<RecipeCreation> {
   _imgFromGallery() async {
     File image = await ImagePicker.pickImage(
         source: ImageSource.gallery, imageQuality: 100);
-
     String imageInBase64 = base64Encode(image.readAsBytesSync());
     setState(() {
       if (image != null) {
@@ -382,6 +405,7 @@ class _RecipeCreationState extends State<RecipeCreation> {
               borderRadius: BorderRadius.all(Radius.circular(5.0)),
               child: Stack(
                 children: <Widget>[
+                  // Image.network(item, fit: BoxFit.cover, width: 1000.0),
                   Image.memory(
                     base64Decode(photo),
                     fit: BoxFit.fitHeight,
@@ -411,8 +435,8 @@ class _RecipeCreationState extends State<RecipeCreation> {
                           ),
                           onPressed: () {
                             setState(() {
-                              addedPhotos.removeWhere(
-                                  (element) => element == photo);
+                              addedPhotos
+                                  .removeWhere((element) => element == photo);
                             });
                           },
                         )
@@ -565,36 +589,28 @@ class _RecipeCreationState extends State<RecipeCreation> {
         }
       });
 
-      Recipe creatingRecipe = Recipe(
-          null,
-          creatingName,
-          creatingDescription,
-          creatingPreparationTime,
-          DateTime.now(),
-          "loginX",
-          // TODO assign logged user ID
-          addedPhotos,
-          //TODO assign creatingPhotosInBase64
-          addedIngredients,
-          creatingConfectioneryTypes,
-          List<RecipeComment>.empty(),
-          List<RecipeRate>.empty());
+      modifyingRecipe.name = creatingName;
+      modifyingRecipe.description = creatingDescription;
+      modifyingRecipe.preparationTime = creatingPreparationTime;
+      modifyingRecipe.photos = addedPhotos;
+      modifyingRecipe.recipeElements = addedIngredients;
+      modifyingRecipe.confectioneryTypes = creatingConfectioneryTypes;
       // log(creatingRecipe.toJson());
 
       try {
         await Provider.of<RecipesProvider>(context, listen: false)
-            .createRecipe(creatingRecipe);
+            .updateRecipe(modifyingRecipe);
 
-        String createdRecipeId =
-            Provider.of<RecipesProvider>(context, listen: false)
-                .createdRecipeId;
-        log("Created Recipe with id: $createdRecipeId");
+        log("Updated Recipe with id: ${modifyingRecipe.id}");
 
         // TODO fix redirect to created recipe to RecipeDetailsScreen (on RecipeDetails after click return we come back to RecipeCreationScreen)
-        Navigator.of(context).pushNamed(
+        Navigator.of(context).popAndPushNamed(
           RecipeDetails.routeName,
-          arguments: createdRecipeId,
+          arguments: modifyingRecipe.id,
         );
+        /*Navigator.of(context).pushNamedAndRemoveUntil(RecipeDetails.routeName,
+            ModalRoute.withName(RecipeSearch.routeName),
+            arguments: modifyingRecipe.id);*/
       } catch (error) {
         log(error.toString());
         await showDialog(

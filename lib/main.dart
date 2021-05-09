@@ -3,6 +3,7 @@ import 'package:SweetLife/providers/recipes_provider.dart';
 import 'package:SweetLife/providers/shopping_lists_provider.dart';
 import 'package:SweetLife/recipes/screens/recipe_creation.dart';
 import 'package:SweetLife/recipes/screens/recipe_details.dart';
+import 'package:SweetLife/recipes/screens/recipe_modification.dart';
 import 'package:SweetLife/recipes/screens/recipe_search.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_creation.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_details.dart';
@@ -37,7 +38,6 @@ class SweetLifeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: AuthProvider()),
@@ -69,19 +69,15 @@ class SweetLifeApp extends StatelessWidget {
           home: RecipeSearch(),
           routes: {
             RecipeCreation.routeName: (ctx) => RecipeCreation(),
+            RecipeModification.routeName: (ctx) => RecipeModification(),
             RecipeDetails.routeName: (ctx) => RecipeDetails(),
             RecipeSearch.routeName: (ctx) => RecipeSearch(),
             ShoppingListCreation.routeName: (ctx) => ShoppingListCreation(),
-            ShoppingListModification.routeName: (ctx) => ShoppingListModification(),
+            ShoppingListModification.routeName: (ctx) =>
+                ShoppingListModification(),
             ShoppingListDetails.routeName: (ctx) => ShoppingListDetails(),
             ShoppingListOverview.routeName: (ctx) => ShoppingListOverview(),
           },
-          // home: RecipeDetails(),
-          // home: RecipeCreation(),
-          // home: RecipeSearch(recDesc),
-          // home: ShoppingListOverview(),
-          // home: ShoppingListCreation(),
-          // home: ShoppingListDetails(),
         ),
       ),
     );

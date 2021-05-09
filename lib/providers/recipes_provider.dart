@@ -57,7 +57,15 @@ class RecipesProvider with ChangeNotifier {
     var url = Uri.https(apiURL, "/recipes.json");
     final response = await http.post(url, body: recipe.toJson());
 
-    _createdRecipeId = (json.decode(response.body) as Map<String, dynamic>)["name"];
+    _createdRecipeId =
+        (json.decode(response.body) as Map<String, dynamic>)["name"];
+    notifyListeners();
+  }
+
+  Future<void> updateRecipe(Recipe recipe) async {
+    var url = Uri.https(apiURL, "/recipes/${recipe.id}.json");
+    await http.put(url, body: recipe.toJson());
+
     notifyListeners();
   }
 
@@ -67,6 +75,20 @@ class RecipesProvider with ChangeNotifier {
       _fetchAllUnits(),
       _fetchAllConfectioneryTypes()
     ]);
+
+    notifyListeners();
+  }
+
+  Future<void> fetchDataToRecipeModification(String modifyingRecipeId) async {
+    await Future.wait([
+      _fetchAllIngredients(),
+      _fetchAllUnits(),
+      _fetchAllConfectioneryTypes(),
+      _fetchAllRecipes()
+    ]);
+
+    _fetchedRecipeById =
+        _fetchedRecipes.firstWhere((recipe) => recipe.id == modifyingRecipeId);
 
     notifyListeners();
   }
