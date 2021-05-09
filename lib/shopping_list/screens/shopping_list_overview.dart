@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:SweetLife/app_drawer.dart';
 import 'package:SweetLife/model/shopping_list.dart';
 import 'package:SweetLife/providers/shopping_lists_provider.dart';
@@ -23,6 +25,7 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
 
   @override
   void didChangeDependencies() {
+    log("ShoppingListOverview didChangeDepencencies");
     if (!_isInited) {
       setState(() {
         _isLoading = true;
@@ -91,6 +94,7 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
                         )
                             .then((_) {
                           setState(() {
+                            //TODO wołane jest po załadowaniu strony do której nawigujemy, a nie po powrocie do obecnej strony
                             _isInited = false;
                           });
                         });

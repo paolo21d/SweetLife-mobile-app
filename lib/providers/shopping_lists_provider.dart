@@ -83,6 +83,13 @@ class ShoppingListsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateShoppingList(ShoppingList shoppingList) async {
+    var url = Uri.https(apiURL, "/shopping-lists/${shoppingList.id}.json");
+    await http.put(url, body: shoppingList.toJson());
+
+    notifyListeners();
+  }
+
   // private methods
   Future<void> _fetchAllShoppingLists() async {
     // TODO fetch shopping list only for logged user

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:SweetLife/model/shopping_list.dart';
+import 'package:SweetLife/model/shopping_list_element.dart';
 import 'package:SweetLife/providers/shopping_lists_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -117,6 +118,7 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
                           onChanged: (bool value) {
                             setState(() {
                               element.active = value;
+                              _updateShoppingList();
                               //  TODO send request to change active state of ingredient
                             });
                           },
@@ -133,6 +135,7 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
                           secondary: IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () {
+                              _ingredientDeleteProcedure(element);
                               //  TODO remove this element
                             },
                           ),
@@ -164,5 +167,60 @@ class _ShoppingListDetailsState extends State<ShoppingListDetails> {
       );
       return false;
     }
+  }
+
+  Future<bool> _updateShoppingList() async {
+    log("Updating shopping list...");
+    try {
+      await Provider.of<ShoppingListsProvider>(context, listen: false)
+          .updateShoppingList(shoppingList);
+      return true;
+    } catch (error) {
+      log(error.toString());
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Deleting failed!',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+      return false;
+    }
+  }
+
+  Future<void> _ingredientDeleteProcedure(ShoppingListElement deletingElement) {
+    return showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Ingredient Delete'),
+        content: Text(
+            'Are you sure you want to delete ingredient ${deletingElement.ingredient}?'),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Delete'),
+            onPressed: () {
+              Navigator.of(ctx).pop(true);
+            },
+          ),
+          FlatButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(ctx).pop(false);
+            },
+          )
+        ],
+      ),
+    ).then((value) {
+      if (value) {
+        setState(() {
+          shoppingList.elements.removeWhere((element) =>
+              element.ingredient == deletingElement.ingredient &&
+              element.unit == deletingElement.unit &&
+              element.amount == deletingElement.amount);
+          _updateShoppingList();
+        });
+      }
+    });
   }
 }
