@@ -19,26 +19,7 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
   var _isLoading = false;
 
   // fetched data
-  List<ShoppingList> shoppingLists = [
-    /*ShoppingList(
-        "id1",
-        "list1",
-        [ShoppingListElement(10, "ing1", "unit1", true)],
-        DateTime(2021),
-        "login1"),
-    ShoppingList(
-        "id1",
-        "list2",
-        [ShoppingListElement(10, "ing1", "unit1", true)],
-        DateTime(2021),
-        "login1"),
-    ShoppingList(
-        "id1",
-        "list3",
-        [ShoppingListElement(10, "ing1", "unit1", true)],
-        DateTime(2021),
-        "login1"),*/
-  ];
+  List<ShoppingList> shoppingLists = [];
 
   @override
   void didChangeDependencies() {
@@ -103,10 +84,16 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
                     trailing: TextButton(
                       child: Text("Details"),
                       onPressed: () {
-                        Navigator.of(context).pushNamed(
+                        Navigator.of(context)
+                            .pushNamed(
                           ShoppingListDetails.routeName,
                           arguments: shoppingLists[index].id,
-                        );
+                        )
+                            .then((_) {
+                          setState(() {
+                            _isInited = false;
+                          });
+                        });
                       },
                     ),
                   ),
@@ -140,7 +127,6 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //TODO redirect to ShoppingListCreation screen
           Navigator.of(context).pushNamed(ShoppingListCreation.routeName);
         },
         child: Icon(Icons.add),
