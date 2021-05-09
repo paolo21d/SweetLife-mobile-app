@@ -10,6 +10,7 @@ import 'package:SweetLife/model/recipe_comment.dart';
 import 'package:SweetLife/model/recipe_rate.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:SweetLife/providers/recipes_provider.dart';
+import 'package:SweetLife/recipes/screens/recipe_details.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -577,7 +578,8 @@ class _RecipeCreationState extends State<RecipeCreation> {
           creatingDescription,
           creatingPreparationTime,
           DateTime.now(),
-          "loginX", // TODO assign logged user ID
+          "loginX",
+          // TODO assign logged user ID
           List<String>.empty(),
           //TODO assign creatingPhotosInBase64
           addedIngredients,
@@ -588,11 +590,18 @@ class _RecipeCreationState extends State<RecipeCreation> {
 
       try {
         await Provider.of<RecipesProvider>(context, listen: false)
-            .createRecipe(creatingRecipe)
-            .then((value) => log(
-                Provider.of<RecipesProvider>(context, listen: false)
-                    .createdRecipeId));
-      //  redirect to created recipe to RecipeDetailsScreen
+            .createRecipe(creatingRecipe);
+
+        String createdRecipeId =
+            Provider.of<RecipesProvider>(context, listen: false)
+                .createdRecipeId;
+        log("Created Recipe with id: $createdRecipeId");
+
+        // TODO fix redirect to created recipe to RecipeDetailsScreen (on RecipeDetails after click return we come back to RecipeCreationScreen)
+        Navigator.of(context).pushNamed(
+          RecipeDetails.routeName,
+          arguments: createdRecipeId,
+        );
       } catch (error) {
         log(error.toString());
         await showDialog(
