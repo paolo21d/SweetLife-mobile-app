@@ -94,9 +94,13 @@ class _ShoppingListOverviewState extends State<ShoppingListOverview> {
                         )
                             .then((_) {
                           setState(() {
+                            log("Return from ShoppingListDetails navigation");
                             //TODO wołane jest po załadowaniu strony do której nawigujemy, a nie po powrocie do obecnej strony
                             _isInited = false;
+                            // _isLoading = true;
                           });
+
+                          // didChangeDependencies();
                         });
                       },
                     ),

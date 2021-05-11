@@ -45,7 +45,7 @@ class SweetLifeApp extends StatelessWidget {
           create: (_) => RecipesProvider(),
           update: (ctx, auth, previousProvider) {
             previousProvider..authToken = auth.token;
-            previousProvider..userId = auth.userId;
+            previousProvider..user = auth.loggedUser;
             return previousProvider;
           },
         ),
@@ -53,7 +53,7 @@ class SweetLifeApp extends StatelessWidget {
           create: (_) => ShoppingListsProvider(),
           update: (ctx, auth, previousProvider) {
             previousProvider..authToken = auth.token;
-            previousProvider..userId = auth.userId;
+            previousProvider..user = auth.loggedUser;
             return previousProvider;
           },
         ),

@@ -4,12 +4,13 @@ import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/recipe.dart';
 import 'package:SweetLife/model/unit.dart';
+import 'package:SweetLife/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class RecipesProvider with ChangeNotifier {
   String _authToken;
-  String _userId;
+  User _loggedUser;
   final String apiURL =
       "sweetlife-api-default-rtdb.europe-west1.firebasedatabase.app";
 
@@ -25,8 +26,8 @@ class RecipesProvider with ChangeNotifier {
     _authToken = value;
   }
 
-  set userId(String value) {
-    _userId = value;
+  set user(User value) {
+    _loggedUser = value;
   }
 
   List<Recipe> get fetchedRecipes {
