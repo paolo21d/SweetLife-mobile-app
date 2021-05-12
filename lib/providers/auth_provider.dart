@@ -18,7 +18,7 @@ class AuthProvider with ChangeNotifier {
       "sweetlife-api-default-rtdb.europe-west1.firebasedatabase.app";
 
   bool get isAuth {
-    return token != null;
+    return _token != null;
   }
 
   String get token {
@@ -53,7 +53,12 @@ class AuthProvider with ChangeNotifier {
           {"email": email, "password": password, "returnSecureToken": true}),
     );
     _setBasicUserData(response);
-    _loggedUser.photo = await _fetchUserPhoto(_loggedUser.id);
+    try {
+      await _fetchUserPhoto(_loggedUser.id);
+    } catch(error) {
+      _loggedUser.photo = null;
+    }
+    // _loggedUser.photo = await _fetchUserPhoto(_loggedUser.id);
 
     notifyListeners();
   }

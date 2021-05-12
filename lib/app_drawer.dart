@@ -16,23 +16,41 @@ class AppDrawer extends StatelessWidget {
             title: Text("Sweet Life"),
             automaticallyImplyLeading: false,
             actions: [
-
-              TextButton(
-                  onPressed: () {
-                    Provider.of<AuthProvider>(context, listen: false)
-                        .logout()
-                        .then((_) {
-                      Navigator.of(context)
-                          .pushReplacementNamed(AuthScreen.routeName);
-                    });
-                  },
-                  child: Text("Log out")),
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushReplacementNamed(AuthScreen.routeName);
-                  },
-                  child: Text("Log in")),
+              Provider.of<AuthProvider>(context, listen: false).isAuth
+                  ? /*IconButton(
+                      icon: Icon(Icons.logout),
+                      onPressed: () {
+                        Provider.of<AuthProvider>(context, listen: false)
+                            .logout()
+                            .then((_) {
+                          Navigator.of(context)
+                              .pushReplacementNamed(AuthScreen.routeName);
+                        });
+                      },
+                    )*/
+                  FlatButton.icon(
+                      onPressed: () {
+                        Provider.of<AuthProvider>(context, listen: false)
+                            .logout()
+                            .then((_) {
+                          Navigator.of(context)
+                              .pushReplacementNamed(AuthScreen.routeName);
+                        });
+                      },
+                      icon: Icon(Icons.logout),
+                      label: Text(
+                          Provider.of<AuthProvider>(context, listen: false)
+                              .loggedUser
+                              .email),
+                      textColor: Colors.white,
+                    )
+                  : IconButton(
+                      icon: Icon(Icons.login_rounded),
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushReplacementNamed(AuthScreen.routeName);
+                      },
+                    ),
             ],
           ),
           Divider(),
