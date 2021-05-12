@@ -9,6 +9,7 @@ import 'package:SweetLife/shopping_list/screens/shopping_list_creation.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_details.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_modification.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_overview.dart';
+import 'package:SweetLife/user/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -66,7 +67,7 @@ class SweetLifeApp extends StatelessWidget {
               accentColor: Colors.amberAccent,
               visualDensity: VisualDensity.adaptivePlatformDensity,
               scaffoldBackgroundColor: Colors.white),
-          home: RecipeSearch(),
+          home: AuthScreen(),
           routes: {
             RecipeCreation.routeName: (ctx) => RecipeCreation(),
             RecipeModification.routeName: (ctx) => RecipeModification(),
@@ -77,6 +78,7 @@ class SweetLifeApp extends StatelessWidget {
                 ShoppingListModification(),
             ShoppingListDetails.routeName: (ctx) => ShoppingListDetails(),
             ShoppingListOverview.routeName: (ctx) => ShoppingListOverview(),
+            AuthScreen.routeName: (ctx) => AuthScreen(),
           },
         ),
       ),

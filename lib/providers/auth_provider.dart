@@ -22,12 +22,13 @@ class AuthProvider with ChangeNotifier {
   }
 
   String get token {
-    if (_expiryDate != null &&
+    /*if (_expiryDate != null &&
         _expiryDate.isAfter(DateTime.now()) &&
         _token != null) {
       return _token;
     }
-    return null;
+    return null;*/
+    return _token;
   }
 
   User get loggedUser {
@@ -42,7 +43,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> signIn(String email, String password) async {
+  Future<void> logIn(String email, String password) async {
     _loggedUser = User();
     var url = Uri.https(
         _authApiURL, "/v1/accounts:signInWithPassword", {"key": _webApiKey});
@@ -55,6 +56,12 @@ class AuthProvider with ChangeNotifier {
     _loggedUser.photo = await _fetchUserPhoto(_loggedUser.id);
 
     notifyListeners();
+  }
+
+  Future<void> logout() async {
+    _token = null;
+    _expiryDate = null;
+    _loggedUser = null;
   }
 
   Future<String> _createUser(String email, String password) async {
