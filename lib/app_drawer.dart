@@ -62,26 +62,33 @@ class AppDrawer extends StatelessWidget {
                   .pushReplacementNamed(RecipeSearch.routeName);
             },
           ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.add),
-            title: Text('Create recipe'),
-            onTap: () {
-              Navigator.of(context)
-                  .pushReplacementNamed(RecipeCreation.routeName);
-            },
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.shopping_basket_rounded),
-            title: Text('Shopping list'),
-            onTap: () {
-              Navigator.of(context)
-                  .pushReplacementNamed(ShoppingListOverview.routeName);
-            },
-          ),
+          Provider.of<AuthProvider>(context, listen: false).isAuth
+              ? _loggedUserRedirections(context)
+              : Container()
         ],
       ),
     );
+  }
+
+  Widget _loggedUserRedirections(BuildContext context) {
+    return Column(children: [
+      Divider(),
+      ListTile(
+        leading: Icon(Icons.add),
+        title: Text('Create recipe'),
+        onTap: () {
+          Navigator.of(context).pushReplacementNamed(RecipeCreation.routeName);
+        },
+      ),
+      Divider(),
+      ListTile(
+        leading: Icon(Icons.shopping_basket_rounded),
+        title: Text('Shopping list'),
+        onTap: () {
+          Navigator.of(context)
+              .pushReplacementNamed(ShoppingListOverview.routeName);
+        },
+      ),
+    ]);
   }
 }
