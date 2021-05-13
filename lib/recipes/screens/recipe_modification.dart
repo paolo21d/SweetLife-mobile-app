@@ -617,7 +617,7 @@ class _RecipeModificationState extends State<RecipeModification> {
           context: context,
           builder: (ctx) => AlertDialog(
             title: Text('An error occurred!'),
-            content: Text('Something went wrong.'),
+            content: Text(error.toString()),
             actions: <Widget>[
               FlatButton(
                 child: Text('Okay'),

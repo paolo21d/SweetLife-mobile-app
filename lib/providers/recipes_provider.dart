@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:SweetLife/exceptions/http_exception.dart';
 import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/recipe.dart';
@@ -55,7 +56,9 @@ class RecipesProvider with ChangeNotifier {
   }
 
   Future<void> createRecipe(Recipe recipe) async {
-    var url = Uri.https(apiURL, "/recipes.json");
+    recipe.auditCU = _loggedUser.id;
+
+    var url = Uri.https(apiURL, "/recipes.json", {"auth": _authToken});
     final response = await http.post(url, body: recipe.toJson());
 
     _createdRecipeId =
@@ -64,7 +67,12 @@ class RecipesProvider with ChangeNotifier {
   }
 
   Future<void> updateRecipe(Recipe recipe) async {
-    var url = Uri.https(apiURL, "/recipes/${recipe.id}.json");
+    if (recipe.auditCU != _loggedUser.id) {
+      throw HttpException("Unauthorized! User is not owner of this object!");
+    }
+
+    var url =
+        Uri.https(apiURL, "/recipes/${recipe.id}.json", {"auth": _authToken});
     await http.put(url, body: recipe.toJson());
 
     notifyListeners();

@@ -574,7 +574,6 @@ class _RecipeCreationState extends State<RecipeCreation> {
           "loginX",
           // TODO assign logged user ID
           addedPhotos,
-          //TODO assign creatingPhotosInBase64
           addedIngredients,
           creatingConfectioneryTypes,
           List<RecipeComment>.empty(),
