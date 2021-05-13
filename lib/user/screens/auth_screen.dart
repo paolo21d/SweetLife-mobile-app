@@ -69,41 +69,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                     ),
                   ),
-                  Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      elevation: 8.0,
-                      child: Column(
-                        children: [
-                          _authMode == AuthMode.Login
-                              ? LoginForm()
-                              : SignupForm(),
-                          FlatButton(
-                            child: Text("Log In"),
-                            onPressed: () {
-                              setState(() {
-                                _authMode = AuthMode.Login;
-                              });
-                            },
-                          ),
-                          FlatButton(
-                            child: Text("Sign Up"),
-                            onPressed: () {
-                              setState(() {
-                                _authMode = AuthMode.Signup;
-                              });
-                            },
-                          ),
-                          FlatButton(
-                            child: Text("Continue without login"),
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pushReplacementNamed(RecipeSearch.routeName);
-                            },
-                          ),
-                        ],
-                      )),
+                  _authMode == AuthMode.Login ? _loginCard() : _signUpCard(),
                 ],
               ),
             ),
@@ -111,5 +77,53 @@ class _AuthScreenState extends State<AuthScreen> {
         ],
       ),
     );
+  }
+
+  Widget _loginCard() {
+    return Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        elevation: 8.0,
+        child: Column(
+          children: [
+            LoginForm(),
+            FlatButton(
+              child: Text("Create Account"),
+              onPressed: () {
+                setState(() {
+                  _authMode = AuthMode.Signup;
+                });
+              },
+            ),
+            FlatButton(
+              child: Text("Continue without login"),
+              onPressed: () {
+                Navigator.of(context)
+                    .pushReplacementNamed(RecipeSearch.routeName);
+              },
+            ),
+          ],
+        ));
+  }
+
+  Widget _signUpCard() {
+    return Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        elevation: 8.0,
+        child: Column(
+          children: [
+            IconButton(
+                icon: Icon(Icons.arrow_back_rounded),
+                onPressed: () {
+                  setState(() {
+                    _authMode = AuthMode.Login;
+                  });
+                }),
+            SignupForm(),
+          ],
+        ));
   }
 }

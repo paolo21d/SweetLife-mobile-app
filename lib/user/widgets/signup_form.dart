@@ -84,7 +84,9 @@ class _SignupFormState extends State<SignupForm> {
                   _signup();
                 },
                 validator: (value) {
-                  if (value != _passwordController.text) {
+                  if (value == null ||
+                      value.isEmpty ||
+                      value != _passwordController.text) {
                     return 'Passwords do not match!';
                   }
                   return null;
@@ -148,6 +150,16 @@ class _SignupFormState extends State<SignupForm> {
                           ),
                         ],
                       )),
+              SizedBox(
+                height: 20,
+              ),
+              FlatButton(
+                child: Text("Sign Up"),
+                textColor: Color.fromRGBO(29, 161, 242, 1.0),
+                onPressed: () {
+                  _signup();
+                },
+              ),
             ],
           )),
     );

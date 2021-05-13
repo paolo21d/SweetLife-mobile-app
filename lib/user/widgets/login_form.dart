@@ -57,6 +57,16 @@ class _LoginFormState extends State<LoginForm> {
                 },
                 onSaved: (value) => _passwordValue = value,
               ),
+              SizedBox(
+                height: 20,
+              ),
+              FlatButton(
+                child: Text("Log In"),
+                textColor: Color.fromRGBO(29, 161, 242, 1.0),
+                onPressed: () {
+                  _login();
+                },
+              ),
             ],
           )),
     );
