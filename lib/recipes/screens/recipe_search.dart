@@ -87,14 +87,14 @@ class _RecipeSearchState extends State<RecipeSearch> {
   void _prepareChosedConfectioneryTypes() {
     choosedConfectioneryType = <String, bool>{};
     for (ConfectioneryType type in availableConfectioneryTypes) {
-      choosedConfectioneryType.putIfAbsent(type.id, () => false);
+      choosedConfectioneryType.putIfAbsent(type.name, () => false);
     }
   }
 
   void _prepareChosedIngredients() {
     choosedIngredient = <String, bool>{};
     for (Ingredient ingredient in availableIngredients) {
-      choosedIngredient.putIfAbsent(ingredient.id, () => false);
+      choosedIngredient.putIfAbsent(ingredient.name, () => false);
     }
   }
 
@@ -153,13 +153,13 @@ class _RecipeSearchState extends State<RecipeSearch> {
                           title: Text("Ingredients"),
                         ),
                         ...availableIngredients.map(
-                          (confectioneryType) {
+                          (ingredient) {
                             return CheckboxListTile(
-                              value: choosedIngredient[confectioneryType.id],
-                              title: Text(confectioneryType.name),
+                              value: choosedIngredient[ingredient.name],
+                              title: Text(ingredient.name),
                               onChanged: (bool value) {
                                 setState(() {
-                                  choosedIngredient[confectioneryType.id] =
+                                  choosedIngredient[ingredient.name] =
                                       value;
                                 });
                               },
@@ -183,12 +183,12 @@ class _RecipeSearchState extends State<RecipeSearch> {
                           (confectioneryType) {
                             return CheckboxListTile(
                               value: choosedConfectioneryType[
-                                  confectioneryType.id],
+                                  confectioneryType.name],
                               title: Text(confectioneryType.name),
                               onChanged: (bool value) {
                                 setState(() {
                                   choosedConfectioneryType[
-                                      confectioneryType.id] = value;
+                                      confectioneryType.name] = value;
                                 });
                               },
                               // contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
@@ -214,10 +214,33 @@ class _RecipeSearchState extends State<RecipeSearch> {
       ),
     );
 
-    if (result) {
+    if (result != null && result) {
       String searchText = _searchText.value.text;
       double maxPreparationTime =
-          double.parse(_searchPreparationTime.value.text);
+          double.tryParse(_searchPreparationTime.value.text);
+      List<String> filterIngredients = [];
+      choosedIngredient.forEach((ingredientName, checked) {
+        if (checked) {
+          filterIngredients.add(ingredientName);
+        }
+      });
+      List<String> filterConfectioneryTypes = [];
+      choosedConfectioneryType.forEach((confectioneryTypeName, checked) {
+        if (checked) {
+          filterConfectioneryTypes.add(confectioneryTypeName);
+        }
+      });
+
+      Provider.of<RecipesProvider>(context, listen: false)
+          .fetchFilteredRecipes(searchText, maxPreparationTime,
+              filterIngredients, filterConfectioneryTypes)
+          .then((_) {
+        setState(() {
+          recipesToDisplay =
+              Provider.of<RecipesProvider>(context, listen: false)
+                  .fetchedRecipes;
+        });
+      });
     }
   }
 }

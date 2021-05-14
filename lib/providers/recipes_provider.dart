@@ -123,7 +123,40 @@ class RecipesProvider with ChangeNotifier {
 
   Future<void> fetchFilteredRecipes(String searchText, double preparationTime,
       List<String> ingredients, List<String> confectioneryTypes) async {
-    //TODO implement filtering
+    await _fetchAllRecipes();
+
+    List<Recipe> filteredRecipes = [];
+    for (Recipe recipe in _fetchedRecipes) {
+      if (searchText != null &&
+          searchText.isNotEmpty &&
+          !recipe.name.contains(searchText) &&
+          !recipe.description.contains(searchText)) {
+        continue;
+      }
+      if (preparationTime != null &&
+          preparationTime > 0 &&
+          recipe.preparationTime > preparationTime) {
+        continue;
+      }
+      if (ingredients != null && ingredients.isNotEmpty) {
+        bool intersection = recipe.recipeElements
+            .map((element) => element.ingredientName)
+            .toList()
+            .any((element) => ingredients.contains(element));
+        if (!intersection) continue;
+      }
+      if (confectioneryTypes != null && confectioneryTypes.isNotEmpty) {
+        bool intersection = recipe.confectioneryTypes
+            .map((type) => type.name)
+            .toList()
+            .any((typeName) => confectioneryTypes.contains(typeName));
+        if (!intersection) continue;
+      }
+      filteredRecipes.add(recipe);
+    }
+    _fetchedRecipes = filteredRecipes;
+
+    notifyListeners();
   }
 
   Future<void> _fetchAllRecipes() async {
