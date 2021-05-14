@@ -67,7 +67,16 @@ class SweetLifeApp extends StatelessWidget {
               accentColor: Colors.amberAccent,
               visualDensity: VisualDensity.adaptivePlatformDensity,
               scaffoldBackgroundColor: Colors.white),
-          home: AuthScreen(),
+          home: auth.isAuth
+              ? RecipeSearch()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (ctx, authResultSnapshot) =>
+                      authResultSnapshot.connectionState ==
+                              ConnectionState.waiting
+                          ? CircularProgressIndicator()
+                          : AuthScreen(),
+                ),
           routes: {
             RecipeCreation.routeName: (ctx) => RecipeCreation(),
             RecipeModification.routeName: (ctx) => RecipeModification(),

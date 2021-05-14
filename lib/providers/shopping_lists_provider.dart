@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:SweetLife/exceptions/http_exception.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/shopping_list.dart';
 import 'package:SweetLife/model/unit.dart';
@@ -79,6 +80,8 @@ class ShoppingListsProvider with ChangeNotifier {
   }
 
   Future<void> createShoppingList(ShoppingList shoppingList) async {
+    shoppingList.auditCU = _loggedUser.id;
+
     var url = Uri.https(apiURL, "/shopping-lists.json");
     final response = await http.post(url, body: shoppingList.toJson());
 
@@ -88,6 +91,15 @@ class ShoppingListsProvider with ChangeNotifier {
   }
 
   Future<void> deleteShoppingList(String shoppingListId) async {
+    ShoppingList deletingShoppingList = _fetchedShoppingLists
+        .firstWhere((element) => element.id == shoppingListId);
+    if (deletingShoppingList == null) {
+      throw HttpException("There is no such an object!");
+    }
+    if (deletingShoppingList.auditCU != _loggedUser.id) {
+      throw HttpException("Unauthorized! User is not owner of this object!");
+    }
+
     var url = Uri.https(apiURL, "/shopping-lists/$shoppingListId.json");
     await http.delete(url);
 
@@ -95,6 +107,10 @@ class ShoppingListsProvider with ChangeNotifier {
   }
 
   Future<void> updateShoppingList(ShoppingList shoppingList) async {
+    if (shoppingList.auditCU != _loggedUser.id) {
+      throw HttpException("Unauthorized! User is not owner of this object!");
+    }
+
     var url = Uri.https(apiURL, "/shopping-lists/${shoppingList.id}.json");
     await http.put(url, body: shoppingList.toJson());
 
@@ -104,14 +120,17 @@ class ShoppingListsProvider with ChangeNotifier {
   // private methods
   Future<void> _fetchAllShoppingLists() async {
     // TODO fetch shopping list only for logged user
-    var url = Uri.https(apiURL, "/shopping-lists.json");
+    var url = Uri.https(apiURL, "/shopping-lists.json", {"auth": _authToken});
     final response = await http.get(url);
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
 
     List<ShoppingList> shoppingLists = [];
     extractedData.forEach((shoppingListId, shoppingListJson) {
-      shoppingLists
-          .add(ShoppingList.fromJson(shoppingListId, shoppingListJson));
+      ShoppingList list =
+          ShoppingList.fromJson(shoppingListId, shoppingListJson);
+      if (list.auditCU == _loggedUser.id) {
+        shoppingLists.add(list);
+      }
     });
     _fetchedShoppingLists = shoppingLists;
   }

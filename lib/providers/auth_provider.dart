@@ -5,6 +5,7 @@ import 'package:SweetLife/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
   String _token;
@@ -55,12 +56,45 @@ class AuthProvider with ChangeNotifier {
     _setBasicUserData(response);
     try {
       await _fetchUserPhoto(_loggedUser.id);
-    } catch(error) {
+    } catch (error) {
       _loggedUser.photo = null;
     }
     // _loggedUser.photo = await _fetchUserPhoto(_loggedUser.id);
-
     notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    final userData = json.encode(
+      {
+        'token': _token,
+        'userId': _loggedUser.id,
+        'userEmail': _loggedUser.email,
+        'userPhoto': _loggedUser.photo,
+        'expiryDate': _expiryDate.toIso8601String(),
+      },
+    );
+    prefs.setString('userData', userData);
+  }
+
+  Future<bool> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('userData')) {
+      return false;
+    }
+
+    final extractedUserData =
+        json.decode(prefs.getString('userData')) as Map<String, Object>;
+
+    _expiryDate = DateTime.parse(extractedUserData['expiryDate']);
+    if (_expiryDate.isBefore(DateTime.now())) {
+      return false;
+    }
+    _loggedUser = User();
+    _token = extractedUserData['token'];
+    _loggedUser.id = extractedUserData['userId'];
+    _loggedUser.email = extractedUserData['userEmail'];
+    _loggedUser.photo = extractedUserData['userPhoto'];
+    notifyListeners();
+    return true;
   }
 
   Future<void> logout() async {
@@ -95,6 +129,8 @@ class AuthProvider with ChangeNotifier {
     _token = responseBody["idToken"];
     _loggedUser.id = responseBody["localId"];
     _loggedUser.email = responseBody["email"];
+    _expiryDate = DateTime.now()
+        .add(Duration(seconds: int.parse(responseBody['expiresIn'])));
   }
 
   Future<String> _fetchUserPhoto(String userId) async {
