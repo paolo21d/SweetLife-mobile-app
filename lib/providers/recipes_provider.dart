@@ -4,6 +4,7 @@ import 'package:SweetLife/exceptions/http_exception.dart';
 import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/recipe.dart';
+import 'package:SweetLife/model/recipe_comment.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:SweetLife/model/user.dart';
 import 'package:flutter/material.dart';
@@ -78,6 +79,20 @@ class RecipesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> addCommentToRecipe(String recipeId, String commentValue) async {
+    Recipe recipe = await _fetchRecipeById(recipeId);
+    RecipeComment comment =
+        RecipeComment(commentValue, DateTime.now(), _loggedUser.email);
+    recipe.comments.add(comment);
+
+    var url =
+        Uri.https(apiURL, "/recipes/${recipe.id}.json", {"auth": _authToken});
+    await http.patch(url,
+        body: json.encode({
+          "comments": recipe.comments.map((comment) => comment.toMap()).toList()
+        }));
+  }
+
   Future<void> fetchDataToRecipeCreation() async {
     await Future.wait([
       _fetchAllIngredients(),
@@ -113,10 +128,12 @@ class RecipesProvider with ChangeNotifier {
   }
 
   Future<void> fetchRecipeById(String recipeId) async {
-    await _fetchAllRecipes();
+    /*await _fetchAllRecipes();
 
     _fetchedRecipeById =
-        _fetchedRecipes.firstWhere((recipe) => recipe.id == recipeId);
+        _fetchedRecipes.firstWhere((recipe) => recipe.id == recipeId);*/
+    Recipe recipe = await _fetchRecipeById(recipeId);
+    _fetchedRecipeById = recipe;
 
     notifyListeners();
   }
@@ -170,6 +187,17 @@ class RecipesProvider with ChangeNotifier {
     });
     _fetchedRecipes = recipes;
     // log(response.body);
+  }
+
+  Future<Recipe> _fetchRecipeById(String recipeId) async {
+    var url = Uri.https(apiURL, "/recipes/$recipeId.json");
+    final response = await http.get(url);
+
+    if (response == null) {
+      throw HttpException("Not found recipe with id $recipeId");
+    }
+    final extractedData = json.decode(response.body) as Map<String, dynamic>;
+    return Recipe.fromJson(recipeId, extractedData);
   }
 
   Future<void> _fetchAllIngredients() async {
