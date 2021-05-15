@@ -6,6 +6,7 @@ import 'package:SweetLife/providers/recipes_provider.dart';
 import 'package:SweetLife/recipes/screens/recipe_modification.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +24,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   // String commentValue;
   TextEditingController _commentValueController = TextEditingController();
   TextEditingController _rateValueController = TextEditingController();
+  double _rate = 3;
 
   //fetched data
   Recipe recipe;
@@ -42,6 +44,12 @@ class _RecipeDetailsState extends State<RecipeDetails> {
           _isLoading = false;
           recipe = Provider.of<RecipesProvider>(context, listen: false)
               .fetchedRecipeById;
+          if(_didLoggedUserRatedRecipe()) {
+            _rate = _getLoggedUserRate();
+          }else {
+            _rate = 3.0;
+          }
+
         });
       });
     }
@@ -153,7 +161,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                   //TODO display current rate if logged user already rated recipe
                                   RaisedButton(
                                     onPressed: _addRate,
-                                    child: Text("Add rate"),
+                                    child: _didLoggedUserRatedRecipe() ? Text("Change current rate ${_getLoggedUserRate()}"): Text("Add rate"),
                                   ),
                                 ],
                               )
@@ -323,32 +331,51 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     final rateValue = await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text("Recipe rate"),
-          content: TextField(
+              title: Text("Recipe rate"),
+              /*content:
+                  TextField(
             controller: _rateValueController,
             decoration: InputDecoration(hintText: "Rate"),
             keyboardType: TextInputType.number,
-          ),
-          actions: [
-            FlatButton(
-              onPressed: () {
-                Navigator.of(ctx).pop(_rateValueController.text);
-              },
-              child: Text("Save rate"),
-            ),
-            FlatButton(
-              onPressed: () {
-                Navigator.of(ctx).pop(null);
-              },
-              child: Text("Cancel"),
-              textColor: Colors.grey,
-            ),
-          ],
-        ));
+          ),*/
+              content: RatingBar.builder(
+                initialRating: _rate,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  print(rating);
+                  setState(() {
+                    _rate = rating;
+                  });
+                },
+              ),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop(_rate);
+                  },
+                  child: Text("Save rate"),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop(null);
+                  },
+                  child: Text("Cancel"),
+                  textColor: Colors.grey,
+                ),
+              ],
+            ));
 
-    if (rateValue != null && double.tryParse(rateValue) != null) {
+    if (rateValue != null) {
       await Provider.of<RecipesProvider>(context, listen: false)
-          .addRateToRecipe(recipe.id, double.parse(rateValue));
+          .addRateToRecipe(recipe.id, rateValue);
 
       await Provider.of<RecipesProvider>(context, listen: false)
           .fetchRecipeById(recipe.id);

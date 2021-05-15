@@ -98,9 +98,13 @@ class RecipesProvider with ChangeNotifier {
     Recipe recipe = await _fetchRecipeById(recipeId);
     RecipeRate rate = RecipeRate(rateValue, DateTime.now(), _loggedUser.email);
 
-    recipe.rates
-        .removeWhere((element) => element.userLogin == _loggedUser.email);
-    recipe.rates.add(rate);
+    if (recipe.rates.isNotEmpty) {
+      recipe.rates
+          .removeWhere((element) => element.userLogin == _loggedUser.email);
+      recipe.rates.add(rate);
+    } else {
+      recipe.rates = [rate];
+    }
 
     var url =
         Uri.https(apiURL, "/recipes/${recipe.id}.json", {"auth": _authToken});
