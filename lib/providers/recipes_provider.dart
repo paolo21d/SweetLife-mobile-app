@@ -5,6 +5,7 @@ import 'package:SweetLife/model/confectionery_type.dart';
 import 'package:SweetLife/model/ingredient.dart';
 import 'package:SweetLife/model/recipe.dart';
 import 'package:SweetLife/model/recipe_comment.dart';
+import 'package:SweetLife/model/recipe_rate.dart';
 import 'package:SweetLife/model/unit.dart';
 import 'package:SweetLife/model/user.dart';
 import 'package:flutter/material.dart';
@@ -91,6 +92,21 @@ class RecipesProvider with ChangeNotifier {
         body: json.encode({
           "comments": recipe.comments.map((comment) => comment.toMap()).toList()
         }));
+  }
+
+  Future<void> addRateToRecipe(String recipeId, double rateValue) async {
+    Recipe recipe = await _fetchRecipeById(recipeId);
+    RecipeRate rate = RecipeRate(rateValue, DateTime.now(), _loggedUser.email);
+
+    recipe.rates
+        .removeWhere((element) => element.userLogin == _loggedUser.email);
+    recipe.rates.add(rate);
+
+    var url =
+        Uri.https(apiURL, "/recipes/${recipe.id}.json", {"auth": _authToken});
+    await http.patch(url,
+        body: json.encode(
+            {"rates": recipe.rates.map((rate) => rate.toMap()).toList()}));
   }
 
   Future<void> fetchDataToRecipeCreation() async {

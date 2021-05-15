@@ -20,8 +20,9 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   bool _isInited = false;
   bool _isLoading = false;
 
-  String commentValue;
+  // String commentValue;
   TextEditingController _commentValueController = TextEditingController();
+  TextEditingController _rateValueController = TextEditingController();
 
   //fetched data
   Recipe recipe;
@@ -149,6 +150,7 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                     onPressed: _addComment,
                                     child: Text("Add comment"),
                                   ),
+                                  //TODO display current rate if logged user already rated recipe
                                   RaisedButton(
                                     onPressed: _addRate,
                                     child: Text("Add rate"),
@@ -317,7 +319,46 @@ class _RecipeDetailsState extends State<RecipeDetails> {
     }
   }
 
-  void _addRate() {}
+  void _addRate() async {
+    final rateValue = await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text("Recipe rate"),
+          content: TextField(
+            controller: _rateValueController,
+            decoration: InputDecoration(hintText: "Rate"),
+            keyboardType: TextInputType.number,
+          ),
+          actions: [
+            FlatButton(
+              onPressed: () {
+                Navigator.of(ctx).pop(_rateValueController.text);
+              },
+              child: Text("Save rate"),
+            ),
+            FlatButton(
+              onPressed: () {
+                Navigator.of(ctx).pop(null);
+              },
+              child: Text("Cancel"),
+              textColor: Colors.grey,
+            ),
+          ],
+        ));
+
+    if (rateValue != null && double.tryParse(rateValue) != null) {
+      await Provider.of<RecipesProvider>(context, listen: false)
+          .addRateToRecipe(recipe.id, double.parse(rateValue));
+
+      await Provider.of<RecipesProvider>(context, listen: false)
+          .fetchRecipeById(recipe.id);
+
+      setState(() {
+        recipe = Provider.of<RecipesProvider>(context, listen: false)
+            .fetchedRecipeById;
+      });
+    }
+  }
 
   bool _didLoggedUserRatedRecipe() {
     return Provider.of<AuthProvider>(context, listen: false).isAuth &&
