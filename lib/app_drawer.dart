@@ -1,5 +1,6 @@
 import 'package:SweetLife/providers/auth_provider.dart';
 import 'package:SweetLife/recipes/screens/recipe_creation.dart';
+import 'package:SweetLife/recipes/screens/recipe_owner_list.dart';
 import 'package:SweetLife/recipes/screens/recipe_search.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_overview.dart';
 import 'package:SweetLife/user/screens/auth_screen.dart';
@@ -72,6 +73,14 @@ class AppDrawer extends StatelessWidget {
 
   Widget _loggedUserRedirections(BuildContext context) {
     return Column(children: [
+      Divider(),
+      ListTile(
+        leading: Icon(Icons.list_alt_rounded),
+        title: Text("My recipes"),
+        onTap: () {
+          Navigator.of(context).pushReplacementNamed(RecipeOwnerList.routeName);
+        },
+      ),
       Divider(),
       ListTile(
         leading: Icon(Icons.add),

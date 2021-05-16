@@ -88,7 +88,7 @@ class _RecipeModificationState extends State<RecipeModification> {
               .fetchedRecipeById;
           addedIngredients = modifyingRecipe.recipeElements;
           addedPhotos = modifyingRecipe.photos;
-          //TODO set name, description, preparation time
+          //set name, description, preparation time
           _initRecipeNameValue = modifyingRecipe.name;
           _initRecipeDescriptionValue = modifyingRecipe.description;
           _initRecipePreparationTimeValue =

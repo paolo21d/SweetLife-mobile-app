@@ -4,6 +4,7 @@ import 'package:SweetLife/providers/shopping_lists_provider.dart';
 import 'package:SweetLife/recipes/screens/recipe_creation.dart';
 import 'package:SweetLife/recipes/screens/recipe_details.dart';
 import 'package:SweetLife/recipes/screens/recipe_modification.dart';
+import 'package:SweetLife/recipes/screens/recipe_owner_list.dart';
 import 'package:SweetLife/recipes/screens/recipe_search.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_creation.dart';
 import 'package:SweetLife/shopping_list/screens/shopping_list_details.dart';
@@ -81,6 +82,7 @@ class SweetLifeApp extends StatelessWidget {
             RecipeCreation.routeName: (ctx) => RecipeCreation(),
             RecipeModification.routeName: (ctx) => RecipeModification(),
             RecipeDetails.routeName: (ctx) => RecipeDetails(),
+            RecipeOwnerList.routeName: (ctx) => RecipeOwnerList(),
             RecipeSearch.routeName: (ctx) => RecipeSearch(),
             ShoppingListCreation.routeName: (ctx) => ShoppingListCreation(),
             ShoppingListModification.routeName: (ctx) =>

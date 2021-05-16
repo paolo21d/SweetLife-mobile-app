@@ -119,7 +119,6 @@ class ShoppingListsProvider with ChangeNotifier {
 
   // private methods
   Future<void> _fetchAllShoppingLists() async {
-    // TODO fetch shopping list only for logged user
     var url = Uri.https(apiURL, "/shopping-lists.json", {"auth": _authToken});
     final response = await http.get(url);
     final extractedData = json.decode(response.body) as Map<String, dynamic>;

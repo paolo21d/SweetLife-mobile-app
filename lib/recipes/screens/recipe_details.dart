@@ -44,12 +44,11 @@ class _RecipeDetailsState extends State<RecipeDetails> {
           _isLoading = false;
           recipe = Provider.of<RecipesProvider>(context, listen: false)
               .fetchedRecipeById;
-          if(_didLoggedUserRatedRecipe()) {
+          if (_didLoggedUserRatedRecipe()) {
             _rate = _getLoggedUserRate();
-          }else {
+          } else {
             _rate = 3.0;
           }
-
         });
       });
     }
@@ -161,7 +160,10 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                                   //TODO display current rate if logged user already rated recipe
                                   RaisedButton(
                                     onPressed: _addRate,
-                                    child: _didLoggedUserRatedRecipe() ? Text("Change current rate ${_getLoggedUserRate()}"): Text("Add rate"),
+                                    child: _didLoggedUserRatedRecipe()
+                                        ? Text(
+                                            "Change current rate ${_getLoggedUserRate()}")
+                                        : Text("Add rate"),
                                   ),
                                 ],
                               )

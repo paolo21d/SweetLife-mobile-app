@@ -196,6 +196,13 @@ class RecipesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchRecipesForLoggedUser() async {
+    await _fetchRecipesForUser(_loggedUser.id);
+
+    notifyListeners();
+  }
+
+  // PRIVATE
   Future<void> _fetchAllRecipes() async {
     var url = Uri.https(apiURL, "/recipes.json");
     final response = await http.get(url);
@@ -218,6 +225,14 @@ class RecipesProvider with ChangeNotifier {
     }
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
     return Recipe.fromJson(recipeId, extractedData);
+  }
+
+  Future<void> _fetchRecipesForUser(String userId) async {
+    await _fetchAllRecipes();
+    if (_fetchedRecipes != null || _fetchedRecipes.isNotEmpty) {
+      _fetchedRecipes =
+          _fetchedRecipes.where((recipe) => recipe.auditCU == userId).toList();
+    }
   }
 
   Future<void> _fetchAllIngredients() async {
