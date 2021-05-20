@@ -275,6 +275,12 @@ class _RecipeDetailsState extends State<RecipeDetails> {
   }
 
   List<Widget> imageSliders(List<String> photos) {
+    if(photos.isEmpty)
+      return [Image.network(
+        "https://inzynieriaprocesow.pl/wp-content/themes/consultix/images/no-image-found-360x250.png",
+        fit: BoxFit.cover,
+      )];
+
     return photos
         .map((photo) => Container(
               margin: EdgeInsets.all(5.0),
