@@ -22,7 +22,6 @@ class _SignupFormState extends State<SignupForm> {
 
   String _loginValue = "";
   String _passwordValue = "";
-  String _photo = null;
 
   @override
   Widget build(BuildContext context) {
@@ -96,63 +95,6 @@ class _SignupFormState extends State<SignupForm> {
               SizedBox(
                 height: 20,
               ),
-              //  photo picker
-              Text("Profile photo:"),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  IconButton(
-                      icon: Icon(Icons.photo_library),
-                      onPressed: _imgFromGallery),
-                  IconButton(
-                      icon: Icon(Icons.photo_camera), onPressed: _imgFromCamera)
-                ],
-              ),
-              _photo == null
-                  ? Text("No photo added")
-                  : ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                      child: Stack(
-                        children: <Widget>[
-                          Image.memory(
-                            base64Decode(_photo),
-                            fit: BoxFit.fitHeight,
-                            width: 1000,
-                          ),
-                          Positioned(
-                            bottom: 0.0,
-                            left: 0.0,
-                            right: 0.0,
-                            child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Color.fromARGB(100, 0, 0, 0),
-                                      Color.fromARGB(0, 0, 0, 0)
-                                    ],
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                  ),
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 5.0, horizontal: 20.0),
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _photo = null;
-                                    });
-                                  },
-                                )),
-                          ),
-                        ],
-                      )),
-              SizedBox(
-                height: 20,
-              ),
               FlatButton(
                 child: Text("Sign Up"),
                 textColor: Color.fromRGBO(29, 161, 242, 1.0),
@@ -165,30 +107,6 @@ class _SignupFormState extends State<SignupForm> {
     );
   }
 
-  _imgFromCamera() async {
-    File image = await ImagePicker.pickImage(
-        source: ImageSource.camera, imageQuality: 100);
-
-    if (image != null) {
-      String imageInBase64 = base64Encode(image.readAsBytesSync());
-      setState(() {
-        _photo = imageInBase64;
-      });
-    }
-  }
-
-  _imgFromGallery() async {
-    File image = await ImagePicker.pickImage(
-        source: ImageSource.gallery, imageQuality: 100);
-
-    if (image != null) {
-      String imageInBase64 = base64Encode(image.readAsBytesSync());
-      setState(() {
-        _photo = imageInBase64;
-      });
-    }
-  }
-
   Future<void> _signup() async {
     bool isValidForm = _signupForm.currentState.validate();
     if (isValidForm) {
@@ -196,7 +114,7 @@ class _SignupFormState extends State<SignupForm> {
 
       try {
         await Provider.of<AuthProvider>(context, listen: false)
-            .signUp(_loginValue, _passwordValue, _photo);
+            .signUp(_loginValue, _passwordValue);
         Navigator.of(context).pushReplacementNamed(RecipeSearch.routeName);
       } catch (error) {
         String errorMessage = "Account creation failed";

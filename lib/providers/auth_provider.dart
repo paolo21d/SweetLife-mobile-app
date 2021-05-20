@@ -36,10 +36,10 @@ class AuthProvider with ChangeNotifier {
     return _loggedUser;
   }
 
-  Future<void> signUp(String email, String password, String photo) async {
+  Future<void> signUp(String email, String password) async {
     _loggedUser = User();
     String createdUserId = await _createUser(email, password);
-    await _defineUserData(createdUserId, photo);
+    // await _defineUserData(createdUserId, photo);
 
     notifyListeners();
   }
@@ -116,12 +116,12 @@ class AuthProvider with ChangeNotifier {
     return _loggedUser.id;
   }
 
-  Future<void> _defineUserData(String userUID, String userPhoto) async {
+/*  Future<void> _defineUserData(String userUID, String userPhoto) async {
     var url = Uri.https(_apiURL, "/users/$userUID.json");
     var response = await http.put(url, body: json.encode({"photo": userPhoto}));
 
     _loggedUser.photo = userPhoto;
-  }
+  }*/
 
   void _setBasicUserData(Response response) {
     Map<String, dynamic> responseBody =
