@@ -20,10 +20,12 @@ class ShoppingList {
     this.name = json['name'];
     this.auditCD = DateTime.parse(json['auditCD']);
     this.auditCU = json['auditCU'];
-    this.elements = (json['elements'] as List)
-        .map((element) => ShoppingListElement(element['amount'],
-            element['ingredient'], element['unit'], element['active']))
-        .toList();
+    this.elements = json.containsKey('elements')
+        ? (json['elements'] as List)
+            .map((element) => ShoppingListElement(element['amount'],
+                element['ingredient'], element['unit'], element['active']))
+            .toList()
+        : List<ShoppingListElement>.empty();
   }
 
   String toJson() {

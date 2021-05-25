@@ -21,7 +21,7 @@ class ShoppingListModification extends StatefulWidget {
 class _ShoppingListModificationState extends State<ShoppingListModification> {
   TextEditingController _shoppingListNameController = TextEditingController();
   TextEditingController _ingredientCreationAmountController =
-      TextEditingController();
+  TextEditingController();
 
   String choosedIngredientName;
   String choosedUnitName;
@@ -49,7 +49,10 @@ class _ShoppingListModificationState extends State<ShoppingListModification> {
       _isInited = true;
 
       String modifyingShoppingListId =
-          ModalRoute.of(context).settings.arguments as String;
+      ModalRoute
+          .of(context)
+          .settings
+          .arguments as String;
 
       Provider.of<ShoppingListsProvider>(context)
           .fetchDataToShoppingListModification(modifyingShoppingListId)
@@ -57,13 +60,16 @@ class _ShoppingListModificationState extends State<ShoppingListModification> {
         setState(() {
           _isLoading = false;
           availableIngredients =
-              Provider.of<ShoppingListsProvider>(context, listen: false)
+              Provider
+                  .of<ShoppingListsProvider>(context, listen: false)
                   .allIngredients;
           availableUnits =
-              Provider.of<ShoppingListsProvider>(context, listen: false)
+              Provider
+                  .of<ShoppingListsProvider>(context, listen: false)
                   .allUnits;
           modifyingShoppingList =
-              Provider.of<ShoppingListsProvider>(context, listen: false)
+              Provider
+                  .of<ShoppingListsProvider>(context, listen: false)
                   .fetchedShoppingListById;
           _shoppingListNameController.text = modifyingShoppingList.name;
           ingredients = modifyingShoppingList.elements;
@@ -88,76 +94,78 @@ class _ShoppingListModificationState extends State<ShoppingListModification> {
       ),
       body: _isLoading
           ? Center(
-              child: CircularProgressIndicator(),
-            )
+        child: CircularProgressIndicator(),
+      )
           : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Wrap(
-                      children: [
-                        Text(
-                          "Name",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        TextField(
-                          controller: _shoppingListNameController,
-                          decoration: isValidName
-                              ? InputDecoration(hintText: "Shopping List Name")
-                              : InputDecoration(
-                                  hintText: "Shopping List Name",
-                                  errorText: "Invalid name"),
-                        ),
-                      ],
-                    ),
+                  Text(
+                    "Name",
+                    style: TextStyle(fontSize: 18),
                   ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      "Ingredients",
-                      style: TextStyle(fontSize: 18),
-                    ),
+                  TextField(
+                    controller: _shoppingListNameController,
+                    decoration: isValidName
+                        ? InputDecoration(hintText: "Shopping List Name")
+                        : InputDecoration(
+                        hintText: "Shopping List Name",
+                        errorText: "Invalid name"),
                   ),
-                  !isValidIngredients
-                      ? Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(
-                            "Invalid ingredients",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFFD32F2F),
-                            ),
-                          ),
-                        )
-                      : Center(),
-                  ...ingredients.map((element) {
-                    return Card(
-                      child: ListTile(
-                        title: Text(element.ingredient),
-                        subtitle: Text("${element.amount} ${element.unit}"),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            setState(() {
-                              ingredients.remove(element);
-                            });
-                          },
-                        ),
-                      ),
-                    );
-                  }),
                 ],
               ),
             ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "Ingredients",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            !isValidIngredients
+                ? Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                "Invalid ingredients",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFFD32F2F),
+                ),
+              ),
+            )
+                : Center(),
+            ...ingredients.map((element) {
+              return Card(
+                child: ListTile(
+                  title: Text(element.ingredient),
+                  subtitle: Text("${element.amount} ${element.unit}"),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      setState(() {
+                        ingredients.remove(element);
+                      });
+                    },
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
       floatingActionButton: _isLoading
           ? null
           : FloatingActionButton(
-              onPressed: () => _addIngredient(context),
-              child: Icon(Icons.add),
-              backgroundColor: Theme.of(context).accentColor,
-            ),
+        onPressed: () => _addIngredient(context),
+        child: Icon(Icons.add),
+        backgroundColor: Theme
+            .of(context)
+            .accentColor,
+      ),
     );
   }
 
@@ -179,74 +187,75 @@ class _ShoppingListModificationState extends State<ShoppingListModification> {
 
     final result = await showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text("Add ingredient"),
-        content: StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // ingredient
-                Text("Ingredient:"),
-                DropdownButton(
-                  value: choosedIngredientName,
-                  items: availableIngredients.map((ingredient) {
-                    return new DropdownMenuItem(
-                      value: ingredient.name,
-                      child: Text(ingredient.name),
-                    );
-                  }).toList(),
-                  onChanged: (String newValue) {
-                    setState(() {
-                      choosedIngredientName = newValue;
-                    });
-                  },
-                  isExpanded: true,
-                ),
-                // unit
-                SizedBox(
-                  height: 10,
-                ),
-                Text("Unit:"),
-                DropdownButton(
-                  value: choosedUnitName,
-                  items: availableUnits.map((unit) {
-                    return DropdownMenuItem(
-                      value: unit.name,
-                      child: Text(unit.name),
-                    );
-                  }).toList(),
-                  onChanged: (String newValue) {
-                    setState(() {
-                      choosedUnitName = newValue;
-                    });
-                  },
-                  isExpanded: true,
-                ),
-                //amount
-                SizedBox(
-                  height: 10,
-                ),
-                Text("Amount:"),
-                TextField(
-                  controller: _ingredientCreationAmountController,
-                  decoration: InputDecoration(hintText: "Amount"),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
-            );
-          },
-        ),
-        actions: [
-          FlatButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: Text("Save")),
-          FlatButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text("Cancel")),
-        ],
-      ),
+      builder: (ctx) =>
+          AlertDialog(
+            title: Text("Add ingredient"),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // ingredient
+                    Text("Ingredient:"),
+                    DropdownButton(
+                      value: choosedIngredientName,
+                      items: availableIngredients.map((ingredient) {
+                        return new DropdownMenuItem(
+                          value: ingredient.name,
+                          child: Text(ingredient.name),
+                        );
+                      }).toList(),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          choosedIngredientName = newValue;
+                        });
+                      },
+                      isExpanded: true,
+                    ),
+                    // unit
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text("Unit:"),
+                    DropdownButton(
+                      value: choosedUnitName,
+                      items: availableUnits.map((unit) {
+                        return DropdownMenuItem(
+                          value: unit.name,
+                          child: Text(unit.name),
+                        );
+                      }).toList(),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          choosedUnitName = newValue;
+                        });
+                      },
+                      isExpanded: true,
+                    ),
+                    //amount
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text("Amount:"),
+                    TextField(
+                      controller: _ingredientCreationAmountController,
+                      decoration: InputDecoration(hintText: "Amount"),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ],
+                );
+              },
+            ),
+            actions: [
+              FlatButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  child: Text("Save")),
+              FlatButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: Text("Cancel")),
+            ],
+          ),
     );
 
     setState(() {
@@ -254,9 +263,15 @@ class _ShoppingListModificationState extends State<ShoppingListModification> {
         // Ingredient ingredient = _getIngredientByName(choosedIngredientName);
         // Unit unit = _getUnitByName(choosedUnitName);
         double amount =
-            double.parse(_ingredientCreationAmountController.value.text);
-        ingredients.add(ShoppingListElement(
-            amount, choosedIngredientName, choosedUnitName, true));
+        double.parse(_ingredientCreationAmountController.value.text);
+
+        ShoppingListElement addingElement = ShoppingListElement(
+            amount, choosedIngredientName, choosedUnitName, true);
+        if (ingredients.isEmpty) {
+          ingredients = [addingElement];
+        }else{
+          ingredients.add(addingElement);
+        }
       }
       choosedIngredientName = availableIngredients[0].name;
       choosedUnitName = availableUnits[0].name;
@@ -287,18 +302,19 @@ class _ShoppingListModificationState extends State<ShoppingListModification> {
         log(error.toString());
         await showDialog(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text('An error occurred!'),
-            content: Text('Something went wrong.'),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Okay'),
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                },
-              )
-            ],
-          ),
+          builder: (ctx) =>
+              AlertDialog(
+                title: Text('An error occurred!'),
+                content: Text('Something went wrong.'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Okay'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                    },
+                  )
+                ],
+              ),
         );
       }
     }

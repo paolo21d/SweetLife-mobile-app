@@ -84,7 +84,12 @@ class RecipesProvider with ChangeNotifier {
     Recipe recipe = await _fetchRecipeById(recipeId);
     RecipeComment comment =
         RecipeComment(commentValue, DateTime.now(), _loggedUser.email);
-    recipe.comments.add(comment);
+
+    if (recipe.comments.isNotEmpty) {
+      recipe.comments.add(comment);
+    }  else {
+      recipe.comments = [comment];
+    }
 
     var url =
         Uri.https(apiURL, "/recipes/${recipe.id}.json", {"auth": _authToken});
