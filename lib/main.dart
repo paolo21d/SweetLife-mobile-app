@@ -12,9 +12,13 @@ import 'package:SweetLife/shopping_list/screens/shopping_list_modification.dart'
 import 'package:SweetLife/shopping_list/screens/shopping_list_overview.dart';
 import 'package:SweetLife/user/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(SweetLifeApp());
 }
 
@@ -62,6 +66,7 @@ class SweetLifeApp extends StatelessWidget {
       ],
       child: Consumer<AuthProvider>(
         builder: (ctx, auth, _) => MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           theme: ThemeData(
               primarySwatch: Colors.blue,
