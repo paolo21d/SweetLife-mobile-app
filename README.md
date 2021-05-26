@@ -1,16 +1,24 @@
 # SweetLife
 
-A new Flutter project.
+Application created for WPAM at Warsaw University of Technology.
 
-## Getting Started
+Technologies:
+- Flutter
+- Firebase
 
-This project is a starting point for a Flutter application.
+## Description
 
-A few resources to get you started if this is your first Flutter project:
+This project is mobile app that is forum for sweet lovers.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Functional requirements:
+- New user registration
+- User login to the application
+- Create a recipe
+- Recipe modification
+- Recipe Search 
+- Commenting on recipes
+- Evaluating regulations
+- Create a shopping list
+- Shopping list modification
+- Marking purchased ingredients (active / inactive)
+- Create a shopping list straight from a recipe
